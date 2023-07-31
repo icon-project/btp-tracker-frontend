@@ -76,22 +76,13 @@ function EventList() {
                 <thead className="bg-gray-100">
                 <tr>
                     <th scope="col" className="px-6 py-3">
-                        src
-                    </th>
-                    <th scope="col" className="px-6 py-3">
-                        nsn
-                    </th>
-                    <th scope="col" className="px-6 py-3">
-                        next
+                        occurred at
                     </th>
                     <th scope="col" className="px-6 py-3">
                         event
                     </th>
                     <th scope="col" className="px-6 py-3">
-                        occurred at
-                    </th>
-                    <th scope="col" className="px-6 py-3">
-                        finalized
+                        next
                     </th>
                     <th scope="col" className="px-6 py-3">
                         created
@@ -100,45 +91,27 @@ function EventList() {
                 </thead>
                 <tbody>
                 <tr className="bg-white border-2">
-                    <td scope="row" className="px-6 py-4 font-medium whitespace-nowrap">
+                    <td className="px-6 py-4">
                         0x61.bsc
-                    </td>
-                    <td className="px-6 py-4">
-                        100
-                    </td>
-                    <td className="px-6 py-4">
-                        0x111.icon
                     </td>
                     <td className="px-6 py-4">
                         SEND
                     </td>
                     <td className="px-6 py-4">
-                        0x61.bsc
-                    </td>
-                    <td className="px-6 py-4">
-                        false
+                        0x111.icon
                     </td>
                     <td className="px-6 py-4">
                         2023-07-20:00:00:00
                     </td>
                 </tr>
                 <tr className="bg-white border-2">
-                    <td scope="row" className="px-6 py-4 font-medium whitespace-nowrap">
-                        0x61.bsc
-                    </td>
                     <td className="px-6 py-4">
-                        100
-                    </td>
-                    <td className="px-6 py-4">
+                        0x111.icon
                     </td>
                     <td className="px-6 py-4">
                         RECEIVE
                     </td>
                     <td className="px-6 py-4">
-                        0x111.icon
-                    </td>
-                    <td className="px-6 py-4">
-                        true
                     </td>
                     <td className="px-6 py-4">
                         2023-07-20:00:01:00

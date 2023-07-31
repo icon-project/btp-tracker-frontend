@@ -1,13 +1,16 @@
 import Link from "next/link";
-import {MessageTable} from "@/app/messages/page";
+import {Message, MessageTable} from "@/app/messages/MessageTable";
 
-export default function Home() {
+export default async function Home() {
+    const r = await fetch(`${process.env.API_URI}/api/v1/status?limit=10`, {cache: 'no-store'});
+    const j = await r.json();
+    const rows = j["rows"] as Message[];
     return (
         <>
             <div className="m-10 flex items-center justify-center">
                 <div className="w-3/4 flex flex-wrap">
                     <Summaries/>
-                    <MessageTable optionalClasses={"mt-7"}/>
+                    <MessageTable optionalClasses={"mt-7"} messages={rows}/>
                     <div className="w-full bg-gray-100 text-center text-2xl text-[#27aab9]">
                         <Link href={"/messages"}>more</Link>
                     </div>
@@ -29,8 +32,8 @@ function Summaries() {
 
 function Summary({summary} : {summary: {[keys: string]: string}}) {
     return (
-        <div className="w-1/3 p-3 text-xl text-right border p-10">
-            <Link href="/messages?net=eth" className="text-[#27aab9]">{summary["network"]}</Link><br/>
+        <div className="w-1/3 text-xl text-right border p-10">
+            <Link href="/messages" className="text-[#27aab9]">{summary["network"]}</Link><br/>
             <span className={"text-2xl font-medium"}>{summary["total"]} messages</span>
         </div>
     )
