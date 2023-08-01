@@ -9,6 +9,8 @@ export default function SelectFilter({options, query, optionalClasses} : {option
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams()!;
+    const params = new URLSearchParams(searchParams.toString());
+    const value = params.get(query) as string || options[0];
     const createQueryString = useCallback(
         (name: string, value: string) => {
             const params = new URLSearchParams(searchParams.toString());
@@ -29,7 +31,7 @@ export default function SelectFilter({options, query, optionalClasses} : {option
     };
     return (
         <>
-            <select className={className} onChange={handleSelect}>
+            <select className={className} onChange={handleSelect} value={value}>
                 {
                     options.map((elem) =>
                         <option key={elem} value={elem}>{elem}</option>
