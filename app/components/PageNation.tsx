@@ -2,7 +2,7 @@
 import Link from "next/link";
 import {useSearchParams} from "next/navigation";
 
-export function PageNation() {
+export function PageNation({pageCount}: {pageCount: number}) {
     const searchParams = useSearchParams()!;
     const params = new URLSearchParams(searchParams.toString());
     const queryObject = Object.fromEntries(params);
@@ -10,8 +10,12 @@ export function PageNation() {
     const p = parseInt(params.get("page") as string || "1");
     const commonClass = "flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 ";
     const linkClass = `${commonClass}hover:bg-gray-100 hover:text-gray-700`;
-    const prev = p - 1 > 0 ? <Link href={{pathname: "/messages", query: {...queryObject, "page": p-1}}} title="prev page" className={linkClass}>&#60;</Link> :
-        <span className={commonClass}>&#60;</span>;
+    const prev = p - 1 > 0 ?
+        <Link href={{pathname: "/messages", query: {...queryObject, "page": p-1}}} title="prev page" className={linkClass}>&#60;</Link>
+        : <span className={commonClass}>&#60;</span>;
+    const next = p + 1 <= pageCount ?
+        <Link href={{pathname: "/messages", query: {...queryObject, "page": p+1}}} title="next page" className={linkClass}>&#62;</Link>
+        : <span className={commonClass}>&#62;</span>;
     return (
         <ul className="flex h-8 text-sm">
             <li>
@@ -25,11 +29,10 @@ export function PageNation() {
                 <span className={commonClass}>{p}page</span>
             </li>
             <li>
-                <Link href={{pathname: "/messages", query: {...queryObject, "page": p+1}}} title="next page"
-                      className={linkClass}>&#62;</Link>
+                {next}
             </li>
             <li>
-                <Link href={{pathname: "/messages", query: {...queryObject, "page": "5"}}} title="last page"
+                <Link href={{pathname: "/messages", query: {...queryObject, "page": pageCount}}} title="last page"
                       className={linkClass}>&#62;&#62;</Link>
             </li>
         </ul>

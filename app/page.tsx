@@ -1,10 +1,11 @@
 import Link from "next/link";
-import {Message, MessageTable} from "@/app/messages/MessageTable";
+import {MessageTable} from "@/app/messages/MessageTable";
+import {BTPMessage} from "@/app/data/BTPMessage";
 
 export default async function Home() {
-    const r = await fetch(`${process.env.API_URI}/api/v1/status?limit=10`, {cache: 'no-store'});
+    const r = await fetch(`${process.env.API_URI}/api/ui/btp/status/latest?sort=updatedAt&sortDesc=desc&limit=15`, {cache: 'no-store'});
     const j = await r.json();
-    const rows = j["rows"] as Message[];
+    const rows = j["list"] as BTPMessage[];
     return (
         <>
             <div className="m-10 flex items-center justify-center">

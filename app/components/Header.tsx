@@ -1,5 +1,7 @@
+'use client'
 import Link from "next/link";
 import "../globals.css";
+import {useRouter} from "next/navigation";
 
 export default function Header() {
     return (
@@ -28,9 +30,19 @@ export function SearchInput() {
         {"value": "0x61.bsc", "name": "0x61.bsc"},
         {"value": "0x111.icon", "name": "0x111.icon"},
     ]
+    const router = useRouter();
+    const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const selectElement = document.querySelector("#searchSelect") as HTMLSelectElement;
+        const inputElement = document.querySelector("#searchInput") as HTMLInputElement;
+        const net = selectElement.value;
+        const nsn = inputElement.value;
+        router.push(`/message/${net}/${nsn}`);
+    }
     return (
         <div className="flex justify-center p-3 bg-[#27aab9] pb-20">
-                <select className="text-xl bg-hsla border border-[#27aab9] rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 text-white mr-1">
+            <form className={"flex w-full justify-center"} onSubmit={onSubmit}>
+                <select className="text-xl bg-hsla border border-[#27aab9] rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 text-white mr-1" id={"searchSelect"}>
                     {options.map((option) => (
                         <option key={option.value} value={option.value}>
                             {option.name}
@@ -38,7 +50,7 @@ export function SearchInput() {
                     ))}
                 </select>
                 <input type="text"
-                       className="bg-hsla rounded-lg block pl-10 p-2.5 focus:bg-[#f0ffff] w-1/4 mr-1 placeholder:text-2xl placeholder:text-gray-150" placeholder="NSN" required/>
+                       className="bg-hsla rounded-lg block pl-10 p-2.5 focus:bg-[#f0ffff] w-1/4 mr-1 placeholder:text-2xl placeholder:text-gray-150" placeholder="NSN" required id={"searchInput"}/>
                 <button type="submit"
                         className="h-full p-2.5 text-xl font-medium text-white bg-hsla rounded-lg">
                     <svg className="w-5 h-7" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -48,6 +60,7 @@ export function SearchInput() {
                     </svg>
                     <span className="sr-only">Search</span>
                 </button>
+            </form>
         </div>
     )
 }
