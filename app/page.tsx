@@ -9,7 +9,7 @@ const networkIconMap: {[key: string]: string} = {
     "0x111.icon": "/logos/havah.png",
 }
 
-interface Summary {
+export interface Summary {
     networkName: string
     networkAddress: string,
     total: number,

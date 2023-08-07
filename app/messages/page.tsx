@@ -2,11 +2,12 @@ import SelectFilter from "@/app/components/SelectFilter";
 import {PageNation} from "@/app/components/PageNation";
 import {MessageTable} from "@/app/messages/MessageTable";
 import {BTPMessage} from "@/app/data/BTPMessage";
+import {Summary} from "@/app/page";
 
-const statusOptions = ["status", "SEND", "RECEIVE"];
-const networkOptions = ["network", "0xaa36a7.eth2", "0x61.bsc", "0x111.icon"];
+const statusOptions = ["status", "SEND", "RECEIVE", "ROUTE", "ERROR", "REPLY", "DROP"];
 const limitOptions = ["25", "50", "100"];
 export default async function Page({searchParams}: {searchParams: {[key: string]: string | string[] | undefined}}) {
+    const networkOptions = await getNetworkOptions();
     const net = ensureOptionValue(searchParams["network"] as string, networkOptions);
     const status = ensureOptionValue(searchParams["status"] as string, statusOptions);
     const limitParam = ensureOptionValue(searchParams["limit"] as string, limitOptions);
@@ -44,4 +45,13 @@ function ensureOptionValue(value: string, options: string[]) {
     for (let i = 1; i < options.length; i++)
         if (options[i] == value) return value;
     return "";
+}
+
+async function getNetworkOptions() {
+    const summaryRes = await fetch(`${process.env.API_URI}/api/ui/network/summary`, {cache: 'no-store'});
+    const summaryJson = await summaryRes.json();
+    const summaries = summaryJson["list"] as Summary[];
+    const options: string[] = ["network"];
+    for (let i = 0; i < summaries.length; i++) options.push(summaries[i].networkAddress);
+    return options;
 }
