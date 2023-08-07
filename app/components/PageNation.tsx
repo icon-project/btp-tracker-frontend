@@ -8,13 +8,14 @@ export function PageNation({pageCount}: {pageCount: number}) {
     const queryObject = Object.fromEntries(params);
     delete queryObject["page"];
     const p = parseInt(params.get("page") as string || "1");
+    const page = (p - Math.floor(p) === 0) && p > 0 ? p : 1;
     const commonClass = "flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 ";
     const linkClass = `${commonClass}hover:bg-gray-100 hover:text-gray-700`;
-    const prev = p - 1 > 0 ?
-        <Link href={{pathname: "/messages", query: {...queryObject, "page": p-1}}} title="prev page" className={linkClass}>&#60;</Link>
+    const prev = page - 1 > 0 ?
+        <Link href={{pathname: "/messages", query: {...queryObject, "page": page-1}}} title="prev page" className={linkClass}>&#60;</Link>
         : <span className={commonClass}>&#60;</span>;
-    const next = p + 1 <= pageCount ?
-        <Link href={{pathname: "/messages", query: {...queryObject, "page": p+1}}} title="next page" className={linkClass}>&#62;</Link>
+    const next = page + 1 <= pageCount ?
+        <Link href={{pathname: "/messages", query: {...queryObject, "page": page+1}}} title="next page" className={linkClass}>&#62;</Link>
         : <span className={commonClass}>&#62;</span>;
     return (
         <ul className="flex h-8 text-sm">
@@ -26,7 +27,7 @@ export function PageNation({pageCount}: {pageCount: number}) {
                 {prev}
             </li>
             <li>
-                <span className={commonClass}>{p}page</span>
+                <span className={commonClass}>{page}page</span>
             </li>
             <li>
                 {next}
