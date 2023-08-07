@@ -5,7 +5,6 @@ export default async function Page({params}: { params: { params: string[] } }) {
     if (!p || p.length > 2 || p.length == 0) throw Error("invalid request. param length must be 1 or 2");
     const reqUri = p.length == 1 ? `${process.env.API_URI}/api/ui/btp/status/${p[0]}` : `${process.env.API_URI}/api/ui/btp/search?source=${p[0]}&nsn=${p[1]}`;
     const res = await fetch(reqUri);
-    console.log(res);
     const message: BTPMessage = await res.json();
     const events: BTPEvent[] = message.events!;
     return (
