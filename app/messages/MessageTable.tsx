@@ -1,6 +1,7 @@
 'use client'
 import {useRouter} from "next/navigation";
 import {BTPMessage} from "@/app/data/BTPMessage";
+import Image from "next/image";
 
 const networkIconMap: {[key: string]: string} = {
     "0x7.icon": "/logos/icon.png",
@@ -15,7 +16,6 @@ export function MessageTable({optionalClasses, messages}: { optionalClasses?: st
     const router = useRouter();
     return (
         <table className={className}>
-            <caption className="text-left text-lg font-bold mb-1">messages</caption>
             <thead className="bg-gray-100 border-2">
             <tr>
                 <th scope="col" className="px-6 py-3">
@@ -42,7 +42,7 @@ export function MessageTable({optionalClasses, messages}: { optionalClasses?: st
                         <tr key={m.id} className="cursor-pointer bg-white border-2 hover:bg-gray-200" tabIndex={0}
                             onClick={() => router.push(`/message/${m.id}`)}>
                             <td scope="row" className="flex items-center px-6 py-4 font-medium whitespace-nowrap">
-                                <img className="w-5 h-5 rounded-full" src={networkIconMap[m.src]} alt={m.src}/>
+                                <Image className="rounded-full" src={networkIconMap[m.src]} alt={m.src} width={30} height={30}/>
                                 <div className="pl-3 text-base font-semibold">{m.src}</div>
                             </td>
                             <td className="px-6 py-4">
