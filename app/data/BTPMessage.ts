@@ -15,5 +15,6 @@ export interface BTPMessage {
     status: string,
     finalized: boolean,
     lastUpdated: string,
+    lastNetwork: string,
     events?: BTPEvent[],
 }

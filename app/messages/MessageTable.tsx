@@ -49,7 +49,7 @@ export function MessageTable({optionalClasses, messages}: { optionalClasses?: st
                                 {m.nsn}
                             </td>
                             <td className="px-6 py-4">
-                                {m.status}
+                                {m.status}{m.status == "ROUTE" && <span className="font-medium text-xs text-gray-400"> ({m.lastNetwork})</span>}
                             </td>
                             <td className="px-6 py-4">
                                 {m.finalized ? "true" : "false"}

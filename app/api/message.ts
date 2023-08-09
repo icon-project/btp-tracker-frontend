@@ -8,6 +8,7 @@ export function getMessage(id: number, srcParam?: string | null, statusParam?: s
     const date = new Date();
     const src = srcParam ? srcParam : networks[id % 4];
     const status = statusParam ? statusParam : statusArr[id % 6];
+    const lastNetwork = status === statusArr[2] ? networks[0] : "";
     return {
         id: id,
         src: src,
@@ -15,6 +16,7 @@ export function getMessage(id: number, srcParam?: string | null, statusParam?: s
         finalized: finalizedArr[id % 2],
         lastUpdated: date.toLocaleString(),
         status,
+        lastNetwork,
         events: getDelivery(src, id)
     };
 }
