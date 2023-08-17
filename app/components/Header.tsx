@@ -3,15 +3,27 @@ import "../globals.css";
 import SearchForm from "@/app/components/SearchForm";
 
 export default async function Header() {
-    const r = await fetch(`${process.env.API_URI}/api/ui/network/summary`, {cache: 'no-store'});
-    const j = await r.json();
-    return (
-        <header>
-            <NaviBar/>
-            <p className="text-5xl text-white bg-[#27aab9] text-center p-7">BTP Message Explorer</p>
-            <SearchForm options={j["list"]}/>
-        </header>
-    )
+    const title =<p className="text-5xl text-white bg-[#27aab9] text-center p-7">BTP Message Explorer</p>;
+    try {
+        const r = await fetch(`${process.env.API_URI}/api/ui/network/summary`, {cache: 'no-store'});
+        const j = await r.json();
+        return (
+            <header>
+                <NaviBar/>
+                {title}
+                <SearchForm options={j["list"]}/>
+            </header>
+        )
+    } catch(error) {
+        return (
+            <header>
+                <NaviBar/>
+                {title}
+                <SearchForm/>
+            </header>
+        )
+    }
+
 }
 function NaviBar() {
     return (

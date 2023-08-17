@@ -18,21 +18,38 @@ export interface Summary {
 }
 
 export default async function Home() {
-    const summaryRes = await fetch(`${process.env.API_URI}/api/ui/network/summary`, {cache: 'no-store'});
-    const summaryJson = await summaryRes.json();
+    try {
+        const summaryRes = await fetch(`${process.env.API_URI}/api/ui/network/summary`, {cache: 'no-store'});
+        const summaryJson = await summaryRes.json();
+        return (
+            <Container>
+                <Summaries summaryList={summaryJson["list"]}/>
+                <RefreshingTable/>
+            </Container>
+        )
+    } catch(error) {
+        return (
+            <Container>
+                <Summaries/>
+                <RefreshingTable/>
+            </Container>
+        )
+    }
+}
+
+function Container({children}: {children: React.ReactNode}) {
     return (
         <>
             <div className="m-10 flex items-center justify-center">
                 <div className="w-3/4 flex flex-wrap">
-                    <Summaries summaryList={summaryJson["list"]}/>
-                    <RefreshingTable/>
+                    {children}
                 </div>
             </div>
         </>
     )
 }
 
-function Summaries({summaryList} : {summaryList: Summary[]}) {
+function Summaries({summaryList} : {summaryList?: Summary[]}) {
     return (
         <>
         {

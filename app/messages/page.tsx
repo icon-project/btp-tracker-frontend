@@ -7,34 +7,46 @@ import {Summary} from "@/app/page";
 const statusOptions = ["status", "SEND", "RECEIVE", "ROUTE", "ERROR", "REPLY", "DROP"];
 const limitOptions = ["25", "50", "100"];
 export default async function Page({searchParams}: {searchParams: {[key: string]: string | string[] | undefined}}) {
-    const networkOptions = await getNetworkOptions();
-    const net = ensureOptionValue(searchParams["network"] as string, networkOptions);
-    const status = ensureOptionValue(searchParams["status"] as string, statusOptions);
-    const limitParam = ensureOptionValue(searchParams["limit"] as string, limitOptions);
-    const limit = limitParam ? limitParam : limitOptions[0];
-    const pageParamNum = parseInt(searchParams["page"] as string || "1");
-    const page = pageParamNum > 0 ? pageParamNum : 1;
-    const req = `${process.env.API_URI}/api/ui/btp/status?page=${page}&limit=${limit}${net ? "&src=" + net : ""}${status ? "&status=" + status : ""}`;
-    const res = await fetch(req, {cache: 'no-store'});
-    const j = await res.json();
-    const messages = j["list"] as BTPMessage[];
-    const pageCount = j["total_pages"] as number;
+    try{
+        const networkOptions = await getNetworkOptions();
+        const net = ensureOptionValue(searchParams["network"] as string, networkOptions);
+        const status = ensureOptionValue(searchParams["status"] as string, statusOptions);
+        const limitParam = ensureOptionValue(searchParams["limit"] as string, limitOptions);
+        const limit = limitParam ? limitParam : limitOptions[0];
+        const pageParamNum = parseInt(searchParams["page"] as string || "1");
+        const page = pageParamNum > 0 ? pageParamNum : 1;
+        const req = `${process.env.API_URI}/api/ui/btp/status?page=${page}&limit=${limit}${net ? "&src=" + net : ""}${status ? "&status=" + status : ""}`;
+        const res = await fetch(req, {cache: 'no-store'});
+        const j = await res.json();
+        const messages = j["list"] as BTPMessage[];
+        const pageCount = j["total_pages"] as number;
+        return (
+            <Container>
+                <div className="flex flex-row-reverse">
+                    <SelectFilter options={statusOptions} query={"status"}/>
+                    <SelectFilter options={networkOptions} query={"network"} optionalClasses={"mr-2"}/>
+                </div>
+                <MessageTable messages={messages}/>
+                <nav className="flex justify-between pt-4" aria-label="Table navigation">
+                        <span className="text-sm font-normal text-gray-400">show
+                            <SelectFilter options={limitOptions} query={"limit"}/>
+                        </span>
+                    <PageNation pageCount={pageCount}/>
+                </nav>
+            </Container>
+        )
+    } catch(error) {
+        return <Container/>
+    }
+}
+
+function Container({children}: {children?: React.ReactNode}) {
     return (
         <section>
             <h2 className="text-4xl text-center mt-7">BTP Messages</h2>
             <div className="overflow-x-auto m-10 flex justify-center">
                 <div className="w-3/4 flex-col">
-                    <div className="flex flex-row-reverse">
-                        <SelectFilter options={statusOptions} query={"status"}/>
-                        <SelectFilter options={networkOptions} query={"network"} optionalClasses={"mr-2"}/>
-                    </div>
-                    <MessageTable messages={messages}/>
-                    <nav className="flex justify-between pt-4" aria-label="Table navigation">
-                        <span className="text-sm font-normal text-gray-400">show
-                            <SelectFilter options={limitOptions} query={"limit"}/>
-                        </span>
-                        <PageNation pageCount={pageCount}/>
-                    </nav>
+                    {children}
                 </div>
             </div>
         </section>

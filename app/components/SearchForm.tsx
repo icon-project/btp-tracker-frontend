@@ -1,7 +1,7 @@
 'use client'
 import {useRouter} from "next/navigation";
 
-export default function SearchForm({options}: {options: {networkAddress: string}[]}) {
+export default function SearchForm({options}: {options?: {networkAddress: string}[]}) {
     const router = useRouter();
     const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -15,7 +15,7 @@ export default function SearchForm({options}: {options: {networkAddress: string}
         <div className="flex justify-center p-3 bg-[#27aab9] pb-20">
             <form className={"flex w-full justify-center"} onSubmit={onSubmit}>
                 <select className="text-xl bg-hsla border border-[#27aab9] rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 text-white mr-1" id={"searchSelect"}>
-                    {options.map((option) => (
+                    {options && options.map((option) => (
                         <option key={option.networkAddress} value={option.networkAddress}>
                             {option.networkAddress}
                         </option>
