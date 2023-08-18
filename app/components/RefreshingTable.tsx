@@ -22,7 +22,6 @@ export default function RefreshingTable() {
     });
     if (!data) return(
         <>
-            <MessageTable optionalClasses={"mt-7"}/>
             <div className="w-full bg-gray-100 text-center text-2xl text-[#27aab9]">
                 <Link href={"/messages"}>more</Link>
             </div>
