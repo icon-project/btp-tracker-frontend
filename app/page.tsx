@@ -17,7 +17,7 @@ export interface Summary {
     completed: number
 }
 
-export default async function Home() {
+export default async function Page() {
     try {
         const summaryRes = await fetch(`${process.env.API_URI}/api/ui/network/summary`, {cache: 'no-store'});
         const summaryJson = await summaryRes.json();
@@ -31,7 +31,6 @@ export default async function Home() {
         return (
             <Container>
                 <Summaries/>
-                <RefreshingTable/>
             </Container>
         )
     }
