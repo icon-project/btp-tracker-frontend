@@ -1,12 +1,13 @@
 import {Summary} from "@/app/page";
 import React from "react";
 import {MessageTableWithFilter} from "@/app/messages/MessageTable";
-export default async function Page() {
-    try{
+export default async function Page({searchParams}: {searchParams: {[key: string]: string | string[] | undefined}}) {
+    try {
         const networkOptions = await getNetworkOptions();
+        const net = ensureOptionValue(searchParams["network"] as string, networkOptions);
         return (
             <Container>
-                <MessageTableWithFilter networkOptions={networkOptions}/>
+                <MessageTableWithFilter networkOptions={networkOptions} selected={net}/>
             </Container>
         )
     } catch(error) {
@@ -25,6 +26,12 @@ function Container({children}: {children?: React.ReactNode}) {
             </div>
         </section>
     )
+}
+
+function ensureOptionValue(value: string, options: string[]) {
+    for (let i = 1; i < options.length; i++)
+        if (options[i] == value) return value;
+    return "";
 }
 
 export async function getNetworkOptions() {

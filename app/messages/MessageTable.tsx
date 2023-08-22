@@ -29,24 +29,28 @@ interface BTPResponse {
 
 const queryClient = new QueryClient();
 
-async function fetchData(options: {pageIndex: number, pageSize: number, columnFilters: ColumnFiltersState}): Promise<BTPResponse> {
+async function fetchData(options: {
+    pageIndex: number,
+    pageSize: number,
+    columnFilters: ColumnFiltersState
+}): Promise<BTPResponse> {
     const firstFilter = options.columnFilters[0];
     const secondFilter = options.columnFilters[1];
-    const optionalQuery = `${firstFilter?.value ? "&" + firstFilter.id + "=" + firstFilter.value : ""}${secondFilter?.value ? "&" + secondFilter.id + "=" + secondFilter.value:""}`;
+    const optionalQuery = `${firstFilter?.value ? "&" + firstFilter.id + "=" + firstFilter.value : ""}${secondFilter?.value ? "&" + secondFilter.id + "=" + secondFilter.value : ""}`;
     const req = `${process.env.NEXT_PUBLIC_API_URI}/api/ui/btp/status?page=${options.pageIndex}&limit=${options.pageSize}${optionalQuery}`;
     const res = await fetch(req, {cache: 'no-store'});
     return await res.json();
 }
 
-export function MessageTableWithFilter({networkOptions}: {networkOptions: string[]}) {
+export function MessageTableWithFilter({networkOptions, selected}: { networkOptions: string[], selected: string }) {
     return (
         <QueryClientProvider client={queryClient}>
-            <FilterableMessageTable networkOptions={networkOptions}/>
+            <FilterableMessageTable networkOptions={networkOptions} selected={selected}/>
         </QueryClientProvider>
     )
 }
 
-export function MessageTable({messages}: {messages: BTPMessage[]}) {
+export function MessageTable({messages}: { messages: BTPMessage[] }) {
     const columns = Columns();
     const tableInstance = useReactTable({
         columns, data: messages,
@@ -86,14 +90,14 @@ function Columns() {
     );
 }
 
-function FilterableMessageTable({networkOptions}: { networkOptions?: string[]}) {
+function FilterableMessageTable({networkOptions, selected}: { networkOptions: string[], selected: string}) {
     const statusOptions = ["", "SEND", "RECEIVE", "ROUTE", "ERROR", "REPLY", "DROP"];
-    const [{ pageIndex, pageSize }, setPagination] =
+    const [{pageIndex, pageSize}, setPagination] =
         React.useState<PaginationState>({
             pageIndex: 0,
             pageSize: 25,
         })
-    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([{id: "src", value: selected}]);
     const pagination = React.useMemo(
         () => ({
             pageIndex,
@@ -114,7 +118,7 @@ function FilterableMessageTable({networkOptions}: { networkOptions?: string[]}) 
     const columns = Columns();
     const defaultData = React.useMemo(() => [], []);
     const tableInstance = useReactTable({
-        columns, data: dataQuery.data?.list?? defaultData,
+        columns, data: dataQuery.data?.list ?? defaultData,
         getCoreRowModel: getCoreRowModel(),
         pageCount: dataQuery.data?.total_pages ?? -1,
         state: {
@@ -129,13 +133,18 @@ function FilterableMessageTable({networkOptions}: { networkOptions?: string[]}) 
     });
     return (
         <>
-            <Table tableInstance={tableInstance} statusOptions={statusOptions} srcOptions={networkOptions}/>
+            <Table tableInstance={tableInstance} statusOptions={statusOptions} srcOptions={networkOptions} selectedSrc={selected}/>
             <TableFooter tableInstance={tableInstance} dataQuery={dataQuery}/>
         </>
     );
 }
 
-function Table({tableInstance, statusOptions, srcOptions}: {tableInstance: Table<BTPMessage>, statusOptions?: string[], srcOptions?: string[]}) {
+function Table({tableInstance, statusOptions, srcOptions, selectedSrc}: {
+    tableInstance: Table<BTPMessage>,
+    statusOptions?: string[],
+    srcOptions?: string[],
+    selectedSrc?: string
+}) {
     return (
         <>
             <table className="w-full text-sm text-left">
@@ -145,10 +154,10 @@ function Table({tableInstance, statusOptions, srcOptions}: {tableInstance: Table
                         {headerGroup.headers.map(header => (
                             <th key={header.id} scope="col" className="px-6 py-3">
                                 {flexRender(header.column.columnDef.header, header.getContext())}
-                                {header.column.id === "src" && !!srcOptions ? <ColumnFilter column={header.column} options={srcOptions}/> :
-                                    null}
-                                {header.column.id === "status" && !!statusOptions ? <ColumnFilter column={header.column} options={statusOptions}/> :
-                                    null}
+                                {header.column.id === "src" && !!srcOptions ?
+                                    <ColumnFilter column={header.column} options={srcOptions} defaultValue={selectedSrc}/> : null}
+                                {header.column.id === "status" && !!statusOptions ?
+                                    <ColumnFilter column={header.column} options={statusOptions}/> : null}
                             </th>
                         ))}
                     </tr>
@@ -164,7 +173,7 @@ function Table({tableInstance, statusOptions, srcOptions}: {tableInstance: Table
     )
 }
 
-function TableCell({cell, lastNetwork}: {cell: Cell<BTPMessage, any>, lastNetwork: string}) {
+function TableCell({cell, lastNetwork}: { cell: Cell<BTPMessage, any>, lastNetwork: string }) {
     const cellClass = "px-6 py-4";
     const imgCellClass = "flex items-center px-6 py-4 font-medium whitespace-nowrap";
     const value = cell.getValue() as string;
@@ -174,12 +183,13 @@ function TableCell({cell, lastNetwork}: {cell: Cell<BTPMessage, any>, lastNetwor
                 <Image className="rounded-full" alt={networkIconMap[value]}
                        src={networkIconMap[value]} width={30} height={30}/>}
             {flexRender(cell.column.columnDef.cell, cell.getContext())}
-            {(cell.column.id) === "status" && (value === "ROUTE") && <span className="font-medium text-xs text-gray-400">({lastNetwork})</span>}
+            {(cell.column.id) === "status" && (value === "ROUTE") &&
+                <span className="font-medium text-xs text-gray-400">({lastNetwork})</span>}
         </td>
     )
 }
 
-function TableRow({row}: {row: Row<BTPMessage>}) {
+function TableRow({row}: { row: Row<BTPMessage> }) {
     const router = useRouter();
     return (
         <tr key={row.id} className="cursor-pointer bg-white border-2 hover:bg-gray-200" tabIndex={0}
@@ -188,12 +198,12 @@ function TableRow({row}: {row: Row<BTPMessage>}) {
                 <TableCell key={cell.id} cell={cell} lastNetwork={row.original.lastNetwork}/>
             ))}
         </tr>
-        )
+    )
 }
 
-function ColumnFilter({options, column}: {options: string[], column: Column<any>}) {
+function ColumnFilter({options, column, defaultValue}: { options: string[], column: Column<any>, defaultValue?: string}) {
     return (
-        <select onChange={e => column.setFilterValue(e.target.value)}>
+        <select onChange={e => column.setFilterValue(e.target.value)} defaultValue={defaultValue}>
             {
                 options.map((elem) =>
                     <option key={elem} value={elem} className={"text-xs font-light"}>{elem}</option>
@@ -203,14 +213,18 @@ function ColumnFilter({options, column}: {options: string[], column: Column<any>
     )
 }
 
-function TableFooter({tableInstance, dataQuery}: {tableInstance: Table<BTPMessage>, dataQuery: UseQueryResult<BTPResponse>}) {
+function TableFooter({tableInstance, dataQuery}: {
+    tableInstance: Table<BTPMessage>,
+    dataQuery: UseQueryResult<BTPResponse>
+}) {
     const commonClass = "flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 ";
     const linkClass = `${commonClass}hover:bg-gray-100 hover:text-gray-700`;
     const pageLimitOptions = [25, 50, 100];
     return (
         <nav className="flex justify-between pt-4" aria-label="Table navigation">
                         <span className="text-sm font-normal text-gray-400">show
-                            <select className="w-25 p-2 mb-6 text-xl text-gray-900 rounded-lg bg-white" onChange={e => tableInstance.setPageSize(Number(e.target.value))}>
+                            <select className="w-25 p-2 mb-6 text-xl text-gray-900 rounded-lg bg-white"
+                                    onChange={e => tableInstance.setPageSize(Number(e.target.value))}>
                                 {
                                     pageLimitOptions.map((elem) =>
                                         <option key={elem} value={elem}>{elem}</option>
@@ -226,13 +240,14 @@ function TableFooter({tableInstance, dataQuery}: {tableInstance: Table<BTPMessag
                     <button className={linkClass} onClick={() => tableInstance.previousPage()}>&#60;</button>
                 </li>
                 <span className={commonClass}>
-                        {tableInstance.getState().pagination.pageIndex+1 + " page"}
+                        {tableInstance.getState().pagination.pageIndex + 1 + " page"}
                     </span>
                 <li>
                     <button className={linkClass} onClick={() => tableInstance.nextPage()}>&#62;</button>
                 </li>
                 <li>
-                    <button className={linkClass} onClick={() => tableInstance.setPageIndex(dataQuery.data!.total_pages)}>&#62;&#62;</button>
+                    <button className={linkClass}
+                            onClick={() => tableInstance.setPageIndex(dataQuery.data!.total_pages)}>&#62;&#62;</button>
                 </li>
             </ul>
         </nav>
