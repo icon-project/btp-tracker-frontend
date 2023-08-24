@@ -4,7 +4,7 @@ import {MessageTableWithFilter} from "@/app/messages/MessageTable";
 export default async function Page({searchParams}: {searchParams: {[key: string]: string | string[] | undefined}}) {
     try {
         const networkOptions = await getNetworkOptions();
-        const net = ensureOptionValue(searchParams["network"] as string, networkOptions);
+        let net = networkOptions.filter(m => searchParams["network"] == m)[0] ?? "";
         return (
             <Container>
                 <MessageTableWithFilter networkOptions={networkOptions} selected={net}/>
@@ -28,17 +28,11 @@ function Container({children}: {children?: React.ReactNode}) {
     )
 }
 
-function ensureOptionValue(value: string, options: string[]) {
-    for (let i = 1; i < options.length; i++)
-        if (options[i] == value) return value;
-    return "";
-}
-
 export async function getNetworkOptions() {
     const summaryRes = await fetch(`${process.env.API_URI}/api/ui/network/summary`, {cache: 'no-store'});
     const summaryJson = await summaryRes.json();
     const summaries = summaryJson["list"] as Summary[];
-    const options: string[] = [""];
+    const options: string[] = ["source network"];
     for (let i = 0; i < summaries.length; i++) options.push(summaries[i].networkAddress);
     return options;
 }

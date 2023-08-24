@@ -23,50 +23,52 @@ export default async function Page({params}: { params: { params: string[] } }) {
 function MessageDetail({message}: { message: BTPMessage }) {
     const messageEvent = message.events!;
     const lastOccurred = messageEvent[messageEvent.length - 1].occurredIn;
+    const cellClass = "pl-2 py-2 font-light";
+    const headerClass = cellClass + " bg-gray-100 text-gray-400";
     return (
         <>
-            <table className="w-full text-xl text-left mb-10">
-                <caption className="text-left text-lg font-bold mb-2">Message</caption>
+            <table className="w-full text-left mb-10 table-fixed">
+                <caption className="text-left text-lg text-gray-400 mb-2">Message</caption>
                 <tbody>
                 <tr className="bg-white border-2">
-                    <th scope="col" className="bg-gray-100 px-6 py-3">
+                    <th scope="col" className={headerClass}>
                         src
                     </th>
-                    <td scope="col" className="px-6 py-3">
+                    <td scope="col" className={cellClass}>
                         {message.src}
                     </td>
-                    <th scope="col" className="bg-gray-100 px-6 py-3">
+                    <th scope="col" className={headerClass}>
                         nsn
                     </th>
-                    <td scope="col" className="px-6 py-3">
+                    <td scope="col" className={cellClass}>
                         {message.nsn}
                     </td>
                 </tr>
                 <tr className="bg-white border-2">
-                    <th scope="row" className="bg-gray-100 px-6 py-3">
+                    <th scope="row" className={headerClass}>
                         status
                     </th>
-                    <td className="px-6 py-3">
+                    <td className={cellClass}>
                         {message.status}
                     </td>
-                    <th scope="col" className="bg-gray-100 px-6 py-3">
+                    <th scope="col" className={headerClass}>
                         last occurred
                     </th>
-                    <td scope="col" className="px-6 py-3">
+                    <td className={cellClass}>
                         {lastOccurred}
                     </td>
                 </tr>
                 <tr className="bg-white border-2">
-                    <th scope="row" className="bg-gray-100 px-6 py-3">
+                    <th scope="row" className={headerClass}>
                         finalized
                     </th>
-                    <td className="px-6 py-4">
+                    <td className={cellClass}>
                         {message.finalized ? "true" : "false"}
                     </td>
-                    <th scope="col" className="bg-gray-100 px-6 py-3">
+                    <th scope="col" className={headerClass}>
                         last updated
                     </th>
-                    <td scope="col" className="px-6 py-3">
+                    <td scope="col" className={cellClass}>
                         {message.lastUpdated}
                     </td>
                 </tr>
@@ -77,22 +79,24 @@ function MessageDetail({message}: { message: BTPMessage }) {
 }
 
 function EventList({events}: { events: BTPEvent[] }) {
+    const cellClass = "pl-2 py-2 font-light";
+    const headerClass = cellClass + " bg-gray-100 text-gray-400";
     return (
         <>
-            <table className="w-full text-xl text-left">
-                <caption className="text-left text-lg font-bold mb-2">Message delivery</caption>
+            <table className="w-full text-left">
+                <caption className="text-left text-lg text-gray-400 mb-2">Message delivery</caption>
                 <thead className="bg-gray-100">
-                <tr>
-                    <th scope="col" className="px-6 py-3">
+                <tr className="border-2">
+                    <th scope="col" className={headerClass}>
                         occurred at
                     </th>
-                    <th scope="col" className="px-6 py-3">
+                    <th scope="col" className={headerClass}>
                         event
                     </th>
-                    <th scope="col" className="px-6 py-3">
+                    <th scope="col" className={headerClass}>
                         next
                     </th>
-                    <th scope="col" className="px-6 py-3">
+                    <th scope="col" className={headerClass}>
                         created
                     </th>
                 </tr>
@@ -102,16 +106,16 @@ function EventList({events}: { events: BTPEvent[] }) {
                     (btpEvent) => (
                         <>
                             <tr key={btpEvent.id} className="bg-white border-2">
-                                <td className="px-6 py-4">
+                                <td className={cellClass}>
                                     {btpEvent.occurredIn}
                                 </td>
-                                <td className="px-6 py-4">
+                                <td className={cellClass}>
                                     {btpEvent.event}
                                 </td>
-                                <td className="px-6 py-4">
+                                <td className={cellClass}>
                                     {btpEvent.next}
                                 </td>
-                                <td className="px-6 py-4">
+                                <td className={cellClass}>
                                     {btpEvent.createdAt}
                                 </td>
                             </tr>

@@ -36,7 +36,8 @@ async function fetchData(options: {
 }): Promise<BTPResponse> {
     const firstFilter = options.columnFilters[0];
     const secondFilter = options.columnFilters[1];
-    const optionalQuery = `${firstFilter?.value ? "&" + firstFilter.id + "=" + firstFilter.value : ""}${secondFilter?.value ? "&" + secondFilter.id + "=" + secondFilter.value : ""}`;
+    const filterNames = ["source network", "status"];
+    const optionalQuery = `${filterNames.filter(n => n == firstFilter.value).length == 0 ? "&" + firstFilter.id + "=" + firstFilter.value : ""}${!!secondFilter && filterNames.filter(n => n == secondFilter.value).length == 0 ? "&" + secondFilter.id + "=" + secondFilter.value : ""}`;
     const req = `${process.env.NEXT_PUBLIC_API_URI}/api/ui/btp/status?page=${options.pageIndex}&limit=${options.pageSize}${optionalQuery}`;
     const res = await fetch(req, {cache: 'no-store'});
     return await res.json();
@@ -66,11 +67,11 @@ function Columns() {
     return React.useMemo(
         () => [
             {
-                header: "src",
+                header: "source network",
                 accessorKey: "src",
             },
             {
-                header: "nsn",
+                header: "serial number",
                 accessorKey: "nsn",
             },
             {
@@ -91,7 +92,7 @@ function Columns() {
 }
 
 function FilterableMessageTable({networkOptions, selected}: { networkOptions: string[], selected: string}) {
-    const statusOptions = ["", "SEND", "RECEIVE", "ROUTE", "ERROR", "REPLY", "DROP"];
+    const statusOptions = ["status", "SEND", "RECEIVE", "ROUTE", "ERROR", "REPLY", "DROP"];
     const [{pageIndex, pageSize}, setPagination] =
         React.useState<PaginationState>({
             pageIndex: 0,
@@ -147,17 +148,17 @@ function Table({tableInstance, statusOptions, srcOptions, selectedSrc}: {
 }) {
     return (
         <>
-            <table className="w-full text-sm text-left">
+            <table className="w-full text-left">
                 <thead className="bg-gray-100 border-2">
                 {tableInstance.getHeaderGroups().map(headerGroup => (
                     <tr key={headerGroup.id}>
                         {headerGroup.headers.map(header => (
-                            <th key={header.id} scope="col" className="px-6 py-3">
-                                {flexRender(header.column.columnDef.header, header.getContext())}
-                                {header.column.id === "src" && !!srcOptions ?
-                                    <ColumnFilter column={header.column} options={srcOptions} defaultValue={selectedSrc}/> : null}
-                                {header.column.id === "status" && !!statusOptions ?
-                                    <ColumnFilter column={header.column} options={statusOptions}/> : null}
+                            <th key={header.id} scope="col" className="pl-6 py-1 font-medium">
+                                {header.column.id === "src" && !!srcOptions &&
+                                    <ColumnFilter column={header.column} options={srcOptions} defaultValue={selectedSrc}/>}
+                                {header.column.id === "status" && !!statusOptions &&
+                                    <ColumnFilter column={header.column} options={statusOptions}/>}
+                                {header.column.id === "src" && !!srcOptions || header.column.id === "status" && !!statusOptions || flexRender(header.column.columnDef.header, header.getContext())}
                             </th>
                         ))}
                     </tr>
@@ -174,8 +175,8 @@ function Table({tableInstance, statusOptions, srcOptions, selectedSrc}: {
 }
 
 function TableCell({cell, lastNetwork}: { cell: Cell<BTPMessage, any>, lastNetwork: string }) {
-    const cellClass = "px-6 py-4";
-    const imgCellClass = "flex items-center px-6 py-4 font-medium whitespace-nowrap";
+    const cellClass = "pl-6 py-3";
+    const imgCellClass = "flex items-center px-6 py-2 font-medium whitespace-nowrap";
     const value = cell.getValue() as string;
     return (
         <td key={cell.id} className={cell.column.id === 'src' ? imgCellClass : cellClass}>
