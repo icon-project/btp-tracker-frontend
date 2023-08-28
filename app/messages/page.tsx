@@ -18,9 +18,9 @@ export default async function Page({searchParams}: {searchParams: {[key: string]
 function Container({children}: {children?: React.ReactNode}) {
     return (
         <section>
-            <h2 className="text-4xl text-center mt-7">BTP Messages</h2>
             <div className="overflow-x-auto m-10 flex justify-center">
                 <div className="w-3/4 flex-col">
+                    <h3 className="text-xl text-left my-3 text-gray-500">BTP Messages</h3>
                     {children}
                 </div>
             </div>

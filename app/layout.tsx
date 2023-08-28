@@ -7,19 +7,26 @@ import Footer from "@/app/components/Footer";
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'BTP tracker',
+  title: 'BTP message explorer',
   description: 'btp message explorer',
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+    let networkOptions;
+    try {
+        const summaryRes = await fetch(`${process.env.API_URI}/api/ui/network/summary`, {cache: 'no-store'});
+        const summaryJson = await summaryRes.json();
+        networkOptions = summaryJson["list"];
+    } catch(error) {
+    }
   return (
     <html lang="en">
       <body className={inter.className + " bg-[#f0ffff] min-h-screen flex flex-col"}>
-      <Header/>
+      <Header networkOptions={networkOptions}/>
       {children}
       <Footer/>
       </body>

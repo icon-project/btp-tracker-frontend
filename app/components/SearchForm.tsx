@@ -1,8 +1,10 @@
 'use client'
-import {useRouter} from "next/navigation";
+import {usePathname, useRouter} from "next/navigation";
+import {Summary} from "@/app/page";
 
-export default function SearchForm({options}: {options?: {networkAddress: string}[]}) {
+export default function SearchForm({options}: {options?: Summary[]}) {
     const router = useRouter();
+    const autoFocus = usePathname() !== "/";
     const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const selectElement = document.querySelector("#searchSelect") as HTMLSelectElement;
@@ -12,7 +14,7 @@ export default function SearchForm({options}: {options?: {networkAddress: string
         router.push(`/message/${net}/${nsn}`);
     }
     return (
-        <div className="flex justify-center p-3 bg-[#27aab9] pb-20">
+        <div className="flex justify-center bg-[#27aab9]">
             <form className={"flex w-full justify-center"} onSubmit={onSubmit}>
                 <select className="text-xl bg-hsla border border-[#27aab9] rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 text-white mr-1" id={"searchSelect"}>
                     {options && options.map((option) => (
@@ -26,6 +28,7 @@ export default function SearchForm({options}: {options?: {networkAddress: string
                        placeholder="NSN"
                        required
                        id={"searchInput"}
+                       autoFocus={autoFocus}
                        onInvalid={e => (e.target as HTMLInputElement).setCustomValidity("Enter valid NSN")}
                        onInput={e => (e.target as HTMLInputElement).setCustomValidity("")}
                 />
