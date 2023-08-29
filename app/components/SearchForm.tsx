@@ -2,7 +2,7 @@
 import {usePathname, useRouter} from "next/navigation";
 import {Summary} from "@/app/page";
 
-export default function SearchForm({options}: {options?: Summary[]}) {
+export default function SearchForm({options, onSubmitAction}: {options?: Summary[], onSubmitAction?: () => void}) {
     const router = useRouter();
     const autoFocus = usePathname() !== "/";
     const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -12,6 +12,7 @@ export default function SearchForm({options}: {options?: Summary[]}) {
         const net = selectElement.value;
         const nsn = inputElement.value;
         router.push(`/message/${net}/${nsn}`);
+        if (!!onSubmitAction) onSubmitAction();
     }
     return (
         <div className="flex justify-center bg-[#27aab9]">

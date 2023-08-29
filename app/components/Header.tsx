@@ -1,11 +1,11 @@
 'use client'
 import Link from "next/link";
 import "../globals.css";
-import SearchButton from "@/app/components/SearchButton";
 import {Summary} from "@/app/page";
 import {Portal} from "@/app/components/Portal";
 import React, {useState} from "react";
 import SearchForm from "@/app/components/SearchForm";
+import {usePathname} from "next/navigation";
 
 export default function Header({networkOptions}: {networkOptions?: Summary[]}) {
     const title = <p className="text-5xl text-white bg-[#27aab9] text-center p-7">BTP Message Explorer</p>;
@@ -18,7 +18,7 @@ export default function Header({networkOptions}: {networkOptions?: Summary[]}) {
     }
     return (
         <>
-            <div id={"modal-root"}/>
+            <div id={"modal-root"} className={"flex"}/>
             {isOpen && <ModalSearchForm options={networkOptions} closeModal={handleCloseModal}/>}
             <NaviBar handleOpenModal={handleOpenModal}/>
             {title}
@@ -39,12 +39,35 @@ function NaviBar({handleOpenModal}: {handleOpenModal: () => void}) {
     )
 }
 
-function ModalSearchForm({options, closeModal}: {options?: Summary[], closeModal: any}) {
+function SearchButton({openModal}: {openModal: () => void}) {
+    const path = usePathname();
+
+    const onSearchButton = () => {
+        if (path !== "/") {
+            openModal();
+        }
+        const searchInput = document.querySelector("#searchInput") as HTMLInputElement
+        searchInput?.focus();
+    }
+    return (
+        <button type="button"
+                className="h-full p-2.5 text-xl font-medium text-white bg-hsla rounded-lg" onClick={() => onSearchButton()}>
+            <svg className="w-5 h-7" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                 viewBox="0 0 20 20">
+                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                      d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+            </svg>
+            <span className="sr-only">Search</span>
+        </button>
+    )
+}
+
+function ModalSearchForm({options, closeModal}: {options?: Summary[], closeModal: () => void}) {
     return (
         <Portal>
-            <div onClick={() => {closeModal()}} className="justify-center items-center flex fixed inset-0 z-50">
-                <div onClick={(e) => e.stopPropagation()} className="content-center">
-                    <SearchForm options={options}/>
+            <div onClick={() => {closeModal()}} className="justify-center items-center flex fixed inset-0">
+                <div onClick={(e) => e.stopPropagation()}>
+                    <SearchForm options={options} onSubmitAction={closeModal}/>
                 </div>
             </div>
         </Portal>
