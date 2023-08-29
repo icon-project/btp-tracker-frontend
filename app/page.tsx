@@ -24,17 +24,21 @@ export default async function Page() {
         const summaryJson = await summaryRes.json();
         return (
             <>
-                <SearchForm options={summaryJson["list"]}/>
+                <div className="flex justify-center bg-[#27aab9] pb-10">
+                    <SearchForm options={summaryJson["list"]}/>
+                </div>
                 <Container>
                     <Summaries summaryList={summaryJson["list"]}/>
                     <RefreshingTable/>
                 </Container>
             </>
         )
-    } catch(error) {
+    } catch (error) {
         return (
             <>
-                <SearchForm/>
+                <div className="flex justify-center bg-[#27aab9] pb-10">
+                    <SearchForm/>
+                </div>
                 <Container>
                     <Summaries/>
                 </Container>
@@ -43,7 +47,7 @@ export default async function Page() {
     }
 }
 
-function Container({children}: {children: React.ReactNode}) {
+function Container({children}: { children: React.ReactNode }) {
     return (
         <>
             <div className="m-10 flex items-center justify-center">
@@ -55,21 +59,23 @@ function Container({children}: {children: React.ReactNode}) {
     )
 }
 
-function Summaries({summaryList} : {summaryList?: Summary[]}) {
+function Summaries({summaryList}: { summaryList?: Summary[] }) {
     return (
         <>
-        {
-            summaryList && summaryList.map(summary => <Summary key={summary["networkAddress"]} summary={summary}/>)
-        }
+            {
+                summaryList && summaryList.map(summary => <Summary key={summary["networkAddress"]} summary={summary}/>)
+            }
         </>
     )
 }
 
-function Summary({summary} : {summary: Summary}) {
+function Summary({summary}: { summary: Summary }) {
     return (
         <div className="w-1/3 text-lg text-left border p-2">
-            <Image className="rounded-full inline" src={networkIconMap[summary["networkAddress"]]} alt={summary["networkAddress"]} width={30} height={30}/>
-            <Link href={`/messages?network=${summary["networkAddress"]}`} className="text-[#27aab9]"> {summary["networkName"]}</Link><br/>
+            <Image className="rounded-full inline" src={networkIconMap[summary["networkAddress"]]}
+                   alt={summary["networkAddress"]} width={30} height={30}/>
+            <Link href={`/messages?network=${summary["networkAddress"]}`}
+                  className="text-[#27aab9]"> {summary["networkName"]}</Link><br/>
             <hr className={"my-3"}/>
             <span>total message : {summary["total"]}</span><br/>
             <span>in delivery : {summary["inDelivery"]}</span><br/>

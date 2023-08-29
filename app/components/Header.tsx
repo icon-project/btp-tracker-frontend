@@ -51,7 +51,7 @@ function SearchButton({openModal}: {openModal: () => void}) {
     }
     return (
         <button type="button"
-                className="h-full p-2.5 text-xl font-medium text-white bg-hsla rounded-lg" onClick={() => onSearchButton()}>
+                className="h-full p-2.5 text-xl font-medium text-white bg-[#85dbe5] rounded-lg" onClick={() => onSearchButton()}>
             <svg className="w-5 h-7" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
                  viewBox="0 0 20 20">
                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"

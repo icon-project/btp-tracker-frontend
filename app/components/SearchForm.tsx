@@ -15,9 +15,8 @@ export default function SearchForm({options, onSubmitAction}: {options?: Summary
         if (!!onSubmitAction) onSubmitAction();
     }
     return (
-        <div className="flex justify-center bg-[#27aab9]">
             <form className={"flex w-full justify-center"} onSubmit={onSubmit}>
-                <select className="text-xl bg-hsla border border-[#27aab9] rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 text-white mr-1" id={"searchSelect"}>
+                <select className="text-xl bg-[#85dbe5] border border-[#27aab9] rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 text-white mr-1" id={"searchSelect"}>
                     {options && options.map((option) => (
                         <option key={option.networkAddress} value={option.networkAddress}>
                             {option.networkAddress}
@@ -25,7 +24,7 @@ export default function SearchForm({options, onSubmitAction}: {options?: Summary
                     ))}
                 </select>
                 <input type="text" pattern="0|[1-9][0-9]*"
-                       className="bg-hsla rounded-lg block pl-10 p-2.5 focus:bg-[#f0ffff] w-1/4 mr-1 placeholder:text-2xl placeholder:text-gray-150"
+                       className="bg-[#85dbe5] rounded-lg block pl-10 p-2.5 focus:bg-[#f0ffff] w-1/4 mr-1 placeholder:text-2xl placeholder:text-gray-150"
                        placeholder="NSN"
                        required
                        id={"searchInput"}
@@ -34,7 +33,7 @@ export default function SearchForm({options, onSubmitAction}: {options?: Summary
                        onInput={e => (e.target as HTMLInputElement).setCustomValidity("")}
                 />
                 <button type="submit"
-                        className="h-full p-2.5 text-xl font-medium text-white bg-hsla rounded-lg">
+                        className="h-full p-2.5 text-xl font-medium text-white bg-[#85dbe5] rounded-lg">
                     <svg className="w-5 h-7" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
                          viewBox="0 0 20 20">
                         <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
@@ -43,6 +42,5 @@ export default function SearchForm({options, onSubmitAction}: {options?: Summary
                     <span className="sr-only">Search</span>
                 </button>
             </form>
-        </div>
     )
 }
