@@ -4,17 +4,37 @@ export interface BTPEvent {
     nsn: number,
     next: string,
     event: string,
-    occurredIn: string,
-    createdAt: string,
+    network_name: string,
+    network_address: string,
+    event_id: string,
+    tx_hash: string,
+    finalized: boolean,
+    created_at: string,
+    updated_at: string,
 }
 
 export interface BTPMessage {
     id: number,
     src: string,
     nsn: string,
-    status: string,
+    status: {
+        String: string,
+        Valid: boolean
+    },
     finalized: boolean,
-    lastUpdated: string,
-    lastNetwork: string,
-    events?: BTPEvent[],
+    last_network_name: {
+        String: string,
+        Valid: boolean
+    },
+    last_network_address: {
+        String: string,
+        Valid: boolean
+    },
+    links: {
+        String: string,
+        Valid: boolean
+    },
+    created_at: string,
+    updated_at: string,
+    btp_events?: BTPEvent[],
 }

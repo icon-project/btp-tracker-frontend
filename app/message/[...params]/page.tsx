@@ -3,10 +3,13 @@ import {BTPEvent, BTPMessage} from "@/app/data/BTPMessage";
 export default async function Page({params}: { params: { params: string[] } }) {
     const p = params["params"];
     if (!p || p.length > 2 || p.length == 0) throw Error("invalid request. param length must be 1 or 2");
-    const reqUri = p.length == 1 ? `${process.env.API_URI}/api/ui/btp/status/${p[0]}` : `${process.env.API_URI}/api/ui/btp/search?source=${p[0]}&nsn=${p[1]}`;
+    const reqUri = p.length == 1 ?
+        `${process.env.API_URI}/tracker/bmc/status/${p[0]}?task=status`
+        : `${process.env.API_URI}/tracker/bmc?task=search&page=0&size=5&sort=created_at desc&query[src]=${p[0]}&query[nsn]=${p[1]}`;
     const res = await fetch(reqUri);
+    console.log(res);
     const message: BTPMessage = await res.json();
-    const events: BTPEvent[] = message.events!;
+    const events: BTPEvent[] = message.btp_events!;
     return (
         <section>
             <h2 className="text-4xl text-center mt-7">BTP Message</h2>
@@ -21,10 +24,9 @@ export default async function Page({params}: { params: { params: string[] } }) {
 }
 
 function MessageDetail({message}: { message: BTPMessage }) {
-    const messageEvent = message.events!;
-    const lastOccurred = messageEvent[messageEvent.length - 1].occurredIn;
     const cellClass = "pl-2 py-2 font-light";
     const headerClass = cellClass + " bg-gray-100 text-gray-400";
+    // @ts-ignore
     return (
         <>
             <table className="w-full text-left mb-10 table-fixed">
@@ -49,13 +51,13 @@ function MessageDetail({message}: { message: BTPMessage }) {
                         status
                     </th>
                     <td className={cellClass}>
-                        {message.status}
+                        {message.status.String}
                     </td>
                     <th scope="col" className={headerClass}>
                         last occurred
                     </th>
                     <td className={cellClass}>
-                        {lastOccurred}
+                        {message.last_network_address.String}
                     </td>
                 </tr>
                 <tr className="bg-white border-2">
@@ -69,7 +71,7 @@ function MessageDetail({message}: { message: BTPMessage }) {
                         last updated
                     </th>
                     <td scope="col" className={cellClass}>
-                        {message.lastUpdated}
+                        {message.updated_at}
                     </td>
                 </tr>
                 </tbody>
@@ -107,7 +109,7 @@ function EventList({events}: { events: BTPEvent[] }) {
                         <>
                             <tr key={btpEvent.id} className="bg-white border-2">
                                 <td className={cellClass}>
-                                    {btpEvent.occurredIn}
+                                    {btpEvent.network_address}
                                 </td>
                                 <td className={cellClass}>
                                     {btpEvent.event}
@@ -116,7 +118,7 @@ function EventList({events}: { events: BTPEvent[] }) {
                                     {btpEvent.next}
                                 </td>
                                 <td className={cellClass}>
-                                    {btpEvent.createdAt}
+                                    {btpEvent.created_at}
                                 </td>
                             </tr>
                         </>

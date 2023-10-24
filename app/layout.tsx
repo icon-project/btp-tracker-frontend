@@ -18,9 +18,9 @@ export default async function RootLayout({
 }) {
     let networkOptions;
     try {
-        const summaryRes = await fetch(`${process.env.API_URI}/api/ui/network/summary`, {cache: 'no-store'});
+        const summaryRes = await fetch(`${process.env.API_URI}/tracker/bmc/summary`, {cache: 'no-store'});
         const summaryJson = await summaryRes.json();
-        networkOptions = summaryJson["list"];
+        networkOptions = summaryJson;
     } catch(error) {
     }
   return (

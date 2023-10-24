@@ -4,31 +4,31 @@ import RefreshingTable from "@/app/components/RefreshingTable";
 import SearchForm from "@/app/components/SearchForm";
 
 const networkIconMap: {[key: string]: string} = {
-    "0x7.icon": "/logos/icon.png",
-    "0xaa36a7.eth2": "/logos/eth.png",
-    "0x61.bsc": "/logos/bnb.png",
+    "0x3.icon": "/logos/icon.png",
+    "0x25d6efd.eth2": "/logos/eth.png",
+    "0x63.bsc": "/logos/bnb.png",
     "0x111.icon": "/logos/havah.png",
 }
 
 export interface Summary {
-    networkName: string
-    networkAddress: string,
-    total: number,
-    inDelivery: number,
-    completed: number
+    network_name: string
+    network_address: string,
+    status_total: number,
+    status_in_delivery: number,
+    status_completed: number
 }
 
 export default async function Page() {
     try {
-        const summaryRes = await fetch(`${process.env.API_URI}/api/ui/network/summary`, {cache: 'no-store'});
+        const summaryRes = await fetch(`${process.env.API_URI}/tracker/bmc/summary`, {cache: 'no-store'});
         const summaryJson = await summaryRes.json();
         return (
             <>
                 <div className="flex justify-center bg-[#27aab9] pb-10">
-                    <SearchForm options={summaryJson["list"]}/>
+                    <SearchForm options={summaryJson}/>
                 </div>
                 <Container>
-                    <Summaries summaryList={summaryJson["list"]}/>
+                    <Summaries summaryList={summaryJson}/>
                     <RefreshingTable/>
                 </Container>
             </>
@@ -63,7 +63,7 @@ function Summaries({summaryList}: { summaryList?: Summary[] }) {
     return (
         <>
             {
-                summaryList && summaryList.map(summary => <Summary key={summary["networkAddress"]} summary={summary}/>)
+                summaryList && summaryList.map(summary => <Summary key={summary["network_address"]} summary={summary}/>)
             }
         </>
     )
@@ -72,14 +72,14 @@ function Summaries({summaryList}: { summaryList?: Summary[] }) {
 function Summary({summary}: { summary: Summary }) {
     return (
         <div className="w-1/3 text-lg text-left border p-2">
-            <Image className="rounded-full inline" src={networkIconMap[summary["networkAddress"]]}
-                   alt={summary["networkAddress"]} width={30} height={30}/>
-            <Link href={`/messages?network=${summary["networkAddress"]}`}
-                  className="text-[#27aab9]"> {summary["networkName"]}</Link><br/>
+            <Image className="rounded-full inline" src={networkIconMap[summary["network_address"]]}
+                   alt={summary["network_address"]} width={30} height={30}/>
+            <Link href={`/messages?network=${summary["network_address"]}`}
+                  className="text-[#27aab9]"> {summary["network_name"]}</Link><br/>
             <hr className={"my-3"}/>
-            <span>total message : {summary["total"]}</span><br/>
-            <span>in delivery : {summary["inDelivery"]}</span><br/>
-            <span>completed : {summary["completed"]}</span>
+            <span>total message : {summary["status_total"]}</span><br/>
+            <span>in delivery : {summary["status_in_delivery"]}</span><br/>
+            <span>completed : {summary["status_completed"]}</span>
         </div>
     )
 }

@@ -6,7 +6,7 @@ import {useEffect} from "react";
 import {QueryClient, QueryClientProvider, useQuery} from "react-query";
 
 const fetchData = async () => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URI}/api/ui/btp/status/latest?sort=updatedAt&sortDesc=desc&limit=15`);
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URI}/tracker/bmc?task=status&page=0&size=15&sort=created_at desc`);
     return await response.json();
 };
 export default function RefreshingTable() {
@@ -40,7 +40,7 @@ function Table() {
             </div>
         </>
     )
-    const messages = query.data["list"] as BTPMessage[];
+    const messages = query.data["content"] as BTPMessage[];
     return (
         <>
             <div className="w-full mt-7"></div>

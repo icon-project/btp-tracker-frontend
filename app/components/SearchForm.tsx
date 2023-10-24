@@ -12,14 +12,15 @@ export default function SearchForm({options, onSubmitAction}: {options?: Summary
         const net = selectElement.value;
         const nsn = inputElement.value;
         router.push(`/message/${net}/${nsn}`);
+        //router.push(`/tracker/bmc?task=search&page=0&size=15&sort=created_at desc&query[src]=${net}&query[nsn]=${nsn}`);
         if (!!onSubmitAction) onSubmitAction();
     }
     return (
             <form className={"flex w-full justify-center"} onSubmit={onSubmit}>
                 <select className="text-xl bg-[#85dbe5] border border-[#27aab9] rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 text-white mr-1" id={"searchSelect"}>
                     {options && options.map((option) => (
-                        <option key={option.networkAddress} value={option.networkAddress}>
-                            {option.networkAddress}
+                        <option key={option.network_address} value={option.network_address}>
+                            {option.network_name}
                         </option>
                     ))}
                 </select>

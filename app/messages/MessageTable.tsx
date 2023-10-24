@@ -16,15 +16,21 @@ import {flexRender, useReactTable} from "@tanstack/react-table";
 import {QueryClient, QueryClientProvider, useQuery, UseQueryResult} from "react-query";
 
 const networkIconMap: { [key: string]: string } = {
-    "0x7.icon": "/logos/icon.png",
-    "0xaa36a7.eth2": "/logos/eth.png",
-    "0x61.bsc": "/logos/bnb.png",
+    "0x3.icon": "/logos/icon.png",
+    "0x25d6efd.eth2": "/logos/eth.png",
+    "0x63.bsc": "/logos/bnb.png",
     "0x111.icon": "/logos/havah.png",
 }
 
 interface BTPResponse {
-    list: BTPMessage[],
+    content: BTPMessage[],
+    total_elements: number,
     total_pages: number,
+    pageable: {
+        page: number,
+        size: number,
+        sort: string
+    }
 }
 
 const queryClient = new QueryClient();
@@ -34,11 +40,12 @@ async function fetchData(options: {
     pageSize: number,
     columnFilters: ColumnFiltersState
 }): Promise<BTPResponse> {
-    const firstFilter = options.columnFilters[0];
-    const secondFilter = options.columnFilters[1];
     const filterNames = ["source network", "status"];
-    const optionalQuery = `${filterNames.filter(n => n == firstFilter.value).length == 0 ? "&" + firstFilter.id + "=" + firstFilter.value : ""}${!!secondFilter && filterNames.filter(n => n == secondFilter.value).length == 0 ? "&" + secondFilter.id + "=" + secondFilter.value : ""}`;
-    const req = `${process.env.NEXT_PUBLIC_API_URI}/api/ui/btp/status?page=${options.pageIndex}&limit=${options.pageSize}${optionalQuery}`;
+    const srcFilter = options.columnFilters[0];
+    const statusFilter = options.columnFilters[1];
+    console.log(srcFilter);
+    const filterQuery = `${filterNames.filter(n => n == srcFilter.value).length == 0 ? "&query[src]=" + srcFilter.value : ""}${!!statusFilter && filterNames.filter(n => n == statusFilter.value).length == 0 ? "&query[status]=" + statusFilter.value : ""}`;
+    const req = `${process.env.NEXT_PUBLIC_API_URI}/tracker/bmc?task=search&page=${options.pageIndex}&size=${options.pageSize}&sort=created_at desc${filterQuery}`;
     const res = await fetch(req, {cache: 'no-store'});
     return await res.json();
 }
@@ -76,16 +83,25 @@ function Columns() {
             },
             {
                 header: "status",
-                accessorKey: "status",
+                accessorKey: "status.String",
+            },
+            {
+                header: "links",
+                accessorKey: "links.String",
             },
             {
                 header: "finalized",
                 accessorKey: "finalized",
             },
             {
-                header: "last updated",
-                accessorKey: "lastUpdated",
+                header: "last network address",
+                accessorKey: "last_network_address.String",
             },
+            {
+                header: "last updated time",
+                accessorKey: "updated_at",
+            },
+
         ],
         []
     );
@@ -112,14 +128,15 @@ function FilterableMessageTable({networkOptions, selected}: { networkOptions: st
         columnFilters
     }
     const dataQuery = useQuery(
-        ['data', fetchDataOptions],
+        ['content', fetchDataOptions],
         () => fetchData(fetchDataOptions),
         {keepPreviousData: true}
     );
     const columns = Columns();
     const defaultData = React.useMemo(() => [], []);
     const tableInstance = useReactTable({
-        columns, data: dataQuery.data?.list ?? defaultData,
+        columns,
+        data: dataQuery.data?.content?? defaultData,
         getCoreRowModel: getCoreRowModel(),
         pageCount: dataQuery.data?.total_pages ?? -1,
         state: {
@@ -174,7 +191,7 @@ function Table({tableInstance, statusOptions, srcOptions, selectedSrc}: {
     )
 }
 
-function TableCell({cell, lastNetwork}: { cell: Cell<BTPMessage, any>, lastNetwork: string }) {
+function TableCell({cell, lastNetwork}: { cell: Cell<BTPMessage, any>, lastNetwork: any }) {
     const cellClass = "pl-6 py-3";
     const imgCellClass = "flex items-center px-6 py-2 font-medium whitespace-nowrap";
     const value = cell.getValue() as string;
@@ -194,9 +211,9 @@ function TableRow({row}: { row: Row<BTPMessage> }) {
     const router = useRouter();
     return (
         <tr key={row.id} className="cursor-pointer bg-white border-2 hover:bg-gray-200" tabIndex={0}
-            onClick={() => router.push(`/message/${row.id}`)}>
+            onClick={() => router.push(`/message/${row.original.id}`)}>
             {row.getVisibleCells().map(cell => (
-                <TableCell key={cell.id} cell={cell} lastNetwork={row.original.lastNetwork}/>
+                <TableCell key={cell.id} cell={cell} lastNetwork={row.original.last_network_address}/>
             ))}
         </tr>
     )

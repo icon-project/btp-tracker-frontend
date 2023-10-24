@@ -11,10 +11,10 @@ function getSummaries() {
 
 function getSummary(id: number) {
     return {
-        networkName: networks[id][1],
-        networkAddress: networks[id][0],
-        total: (id+1) * 100,
-        inDelivery: (id+1) * 50,
-        completed: (id+1) * 50
+        network_name: networks[id][1],
+        network_address: networks[id][0],
+        status_total: (id+1) * 100,
+        status_in_delivery: (id+1) * 50,
+        status_completed: (id+1) * 50
     }
 }
