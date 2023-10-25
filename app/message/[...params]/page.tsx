@@ -51,13 +51,13 @@ function MessageDetail({message}: { message: BTPMessage }) {
                         status
                     </th>
                     <td className={cellClass}>
-                        {message.status.String}
+                        {message.status?.String}
                     </td>
                     <th scope="col" className={headerClass}>
                         last occurred
                     </th>
                     <td className={cellClass}>
-                        {message.last_network_address.String}
+                        {message.last_network_address?.String}
                     </td>
                 </tr>
                 <tr className="bg-white border-2">
