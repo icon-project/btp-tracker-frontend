@@ -43,7 +43,6 @@ async function fetchData(options: {
     const filterNames = ["source network", "status"];
     const srcFilter = options.columnFilters[0];
     const statusFilter = options.columnFilters[1];
-    console.log(srcFilter);
     const filterQuery = `${filterNames.filter(n => n == srcFilter.value).length == 0 ? "&query[src]=" + srcFilter.value : ""}${!!statusFilter && filterNames.filter(n => n == statusFilter.value).length == 0 ? "&query[status]=" + statusFilter.value : ""}`;
     const req = `${process.env.NEXT_PUBLIC_API_URI}/tracker/bmc?task=search&page=${options.pageIndex}&size=${options.pageSize}&sort=created_at desc${filterQuery}`;
     const res = await fetch(req, {cache: 'no-store'});

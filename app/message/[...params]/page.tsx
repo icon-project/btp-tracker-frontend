@@ -5,7 +5,7 @@ export default async function Page({params}: { params: { params: string[] } }) {
     if (!p || p.length > 2 || p.length == 0) throw Error("invalid request. param length must be 1 or 2");
     const reqUri = p.length == 1 ?
         `${process.env.API_URI}/tracker/bmc/status/${p[0]}?task=status`
-        : `${process.env.API_URI}/tracker/bmc?task=search&page=0&size=5&sort=created_at desc&query[src]=${p[0]}&query[nsn]=${p[1]}`;
+        : `${process.env.API_URI}/tracker/bmc/search?query[src]=${p[0]}&query[nsn]=${p[1]}`;
     const res = await fetch(reqUri);
     console.log(res);
     const message: BTPMessage = await res.json();
