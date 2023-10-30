@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
+import ImgInfoContextProvider from "@/app/ImgInfo";
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -26,9 +27,11 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className + " bg-[#f0ffff] min-h-screen flex flex-col"}>
-      <Header networkOptions={networkOptions}/>
-      {children}
-      <Footer/>
+      <ImgInfoContextProvider>
+          <Header networkOptions={networkOptions}/>
+          {children}
+          <Footer/>
+      </ImgInfoContextProvider>
       </body>
     </html>
   )

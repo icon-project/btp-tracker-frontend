@@ -2,7 +2,7 @@
 import {useRouter} from "next/navigation";
 import {BTPMessage} from "@/app/data/BTPMessage";
 import Image from "next/image";
-import React from 'react';
+import React, {useContext} from 'react';
 import {
     Cell, Column, ColumnFiltersState,
     getCoreRowModel,
@@ -14,6 +14,7 @@ import {
 } from "@tanstack/table-core";
 import {flexRender, useReactTable} from "@tanstack/react-table";
 import {QueryClient, QueryClientProvider, useQuery, UseQueryResult} from "react-query";
+import ImgInfoContext from "@/app/context";
 
 interface TrackerNetwork {
     name: string,
@@ -78,6 +79,7 @@ async function fetchData(options: {
 }
 
 export function MessageTableWithFilter({networkOptions, selected}: { networkOptions: string[], selected: string }) {
+    const data = useContext(ImgInfoContext);
     return (
         <QueryClientProvider client={queryClient}>
             <FilterableMessageTable networkOptions={networkOptions} selected={selected}/>
