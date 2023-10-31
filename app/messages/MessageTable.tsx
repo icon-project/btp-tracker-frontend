@@ -34,7 +34,7 @@ async function fetchData(options: {
     pageSize: number,
     columnFilters: ColumnFiltersState
 }): Promise<BTPResponse> {
-    const filterNames = ["source network", "status"];
+    const filterNames = ["Source Network", "Status"];
     const srcFilter = options.columnFilters[0];
     const statusFilter = options.columnFilters[1];
     const filterQuery = `${filterNames.filter(n => n == srcFilter.value).length == 0 ? "&query[src]=" + srcFilter.value : ""}${!!statusFilter && filterNames.filter(n => n == statusFilter.value).length == 0 ? "&query[status]=" + statusFilter.value : ""}`;
@@ -68,31 +68,31 @@ function Columns() {
     return React.useMemo(
         () => [
             {
-                header: "source network",
+                header: "Source Network",
                 accessorKey: "src",
             },
             {
-                header: "serial number",
+                header: "Serial Number",
                 accessorKey: "nsn",
             },
             {
-                header: "status",
+                header: "Status",
                 accessorKey: "status.String",
             },
             {
-                header: "links",
+                header: "Links",
                 accessorKey: "links.String",
             },
             {
-                header: "finalized",
+                header: "Finalized",
                 accessorKey: "finalized",
             },
             {
-                header: "last network address",
+                header: "Last network address",
                 accessorKey: "last_network_address.String",
             },
             {
-                header: "last updated time",
+                header: "Last updated time",
                 accessorKey: "updated_at",
             },
 
@@ -185,7 +185,7 @@ function Table({tableInstance, statusOptions, srcOptions, selectedSrc}: {
     )
 }
 
-function TableCell({cell, lastNetwork}: { cell: Cell<BTPMessage, any>, lastNetwork: any }) {
+function TableCell({cell, lastNetwork, finalized}: { cell: Cell<BTPMessage, any>, lastNetwork: any, finalized: boolean }) {
     const networkMap = useContext(NetworkInfoContext);
     if (Object.keys(networkMap).length === 0) return <td></td>;
     const cellClass = "pl-6 py-3";
@@ -194,12 +194,13 @@ function TableCell({cell, lastNetwork}: { cell: Cell<BTPMessage, any>, lastNetwo
     return (
         <td key={cell.id} className={cell.column.id === 'src' ? imgCellClass : cellClass}>
             {(cell.column.id) === 'src' &&
-                <Image className="rounded-full" alt={value}
+                <Image className="rounded-full pr-2" alt={value}
                        src={`data:image/png;base64,${networkMap[value].imageBase64}`} width={30} height={30}/> }
-
-            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+            {(cell.column.id) === "finalized"
+                ? <span>{finalized ? "True" : "False"}</span>
+                : flexRender(cell.column.columnDef.cell, cell.getContext())}
             {(cell.column.id) === "status" && (value === "ROUTE") &&
-                <span className="font-medium text-xs text-gray-400">({lastNetwork})</span>}
+                <span className="font-medium text-xs text-gray-400"> ({lastNetwork})</span>}
         </td>
     )
 }
@@ -210,7 +211,7 @@ function TableRow({row}: { row: Row<BTPMessage> }) {
         <tr key={row.id} className="cursor-pointer bg-white border-2 hover:bg-gray-200" tabIndex={0}
             onClick={() => router.push(`/message/${row.original.id}`)}>
             {row.getVisibleCells().map(cell => (
-                <TableCell key={cell.id} cell={cell} lastNetwork={row.original.last_network_address}/>
+                <TableCell key={cell.id} cell={cell} finalized={row.original.finalized} lastNetwork={row.original.last_network_address}/>
             ))}
         </tr>
     )
@@ -255,7 +256,7 @@ function TableFooter({tableInstance, dataQuery}: {
                     <button className={linkClass} onClick={() => tableInstance.previousPage()}>&#60;</button>
                 </li>
                 <span className={commonClass}>
-                        {tableInstance.getState().pagination.pageIndex + 1 + " page"}
+                        {tableInstance.getState().pagination.pageIndex + 1}
                     </span>
                 <li>
                     <button className={linkClass} onClick={() => tableInstance.nextPage()}>&#62;</button>

@@ -1,8 +1,11 @@
 'use client'
 import {usePathname, useRouter} from "next/navigation";
-import {Summary} from "@/app/page";
+import {useContext} from "react";
+import {Summary} from "@/app/components/Summuries";
+import NetworkInfoContext from "@/app/context";
 
 export default function SearchForm({options, onSubmitAction}: {options?: Summary[], onSubmitAction?: () => void}) {
+    const nMap = useContext(NetworkInfoContext);
     const router = useRouter();
     const autoFocus = usePathname() !== "/";
     const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -12,7 +15,6 @@ export default function SearchForm({options, onSubmitAction}: {options?: Summary
         const net = selectElement.value;
         const nsn = inputElement.value;
         router.push(`/message/${net}/${nsn}`);
-        //router.push(`/tracker/bmc?task=search&page=0&size=15&sort=created_at desc&query[src]=${net}&query[nsn]=${nsn}`);
         if (!!onSubmitAction) onSubmitAction();
     }
     return (
@@ -20,13 +22,13 @@ export default function SearchForm({options, onSubmitAction}: {options?: Summary
                 <select className="text-xl bg-[#85dbe5] border border-[#27aab9] rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 text-white mr-1" id={"searchSelect"}>
                     {options && options.map((option) => (
                         <option key={option.network_address} value={option.network_address}>
-                            {option.network_name}
+                            {nMap[option.network_address]?.name}
                         </option>
                     ))}
                 </select>
                 <input type="text" pattern="0|[1-9][0-9]*"
                        className="bg-[#85dbe5] rounded-lg block pl-10 p-2.5 focus:bg-[#f0ffff] w-1/4 mr-1 placeholder:text-2xl placeholder:text-gray-150"
-                       placeholder="NSN"
+                       placeholder="Network Serial Number"
                        required
                        id={"searchInput"}
                        autoFocus={autoFocus}

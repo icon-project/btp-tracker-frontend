@@ -36,7 +36,7 @@ function Table() {
     if (!query.data) return (
         <>
             <div className="w-full bg-gray-100 text-center text-[#27aab9] mt-7">
-                <Link href={"/messages"}>more</Link>
+                <Link href={"/messages"}>more ...</Link>
             </div>
         </>
     )
@@ -46,7 +46,7 @@ function Table() {
             <div className="w-full mt-7"></div>
             <MessageTable messages={messages}/>
             <div className="w-full bg-gray-100 text-center text-[#27aab9]">
-                <Link href={"/messages"}>more</Link>
+                <Link href={"/messages"}>more ...</Link>
             </div>
         </>
     );

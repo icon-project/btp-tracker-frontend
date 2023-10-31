@@ -5,7 +5,6 @@ import {useContext} from "react";
 import NetworkInfoContext from "@/app/context";
 
 export interface Summary {
-    network_name: string
     network_address: string,
     status_total: number,
     status_in_delivery: number,
@@ -22,17 +21,17 @@ export default function Summaries({summaryList}: { summaryList?: Summary[] }) {
 }
 
 function Summary({summary}: { summary: Summary }) {
-    const networkInfo = useContext(NetworkInfoContext);
-    if(Object.keys(networkInfo).length === 0) return (<div></div>)
+    const nMap = useContext(NetworkInfoContext);
+    if(Object.keys(nMap).length === 0) return (<div></div>)
     return (
         <div className="w-1/3 text-lg text-left border p-2">
-            <Image className="rounded-full inline" src={`data:image/png;base64,${networkInfo[summary["network_name"]].imageBase64}`}
+            <Image className="rounded-full inline" src={`data:image/png;base64,${nMap[summary["network_address"]].imageBase64}`}
                alt={summary["network_address"]} width={30} height={30}/>
-            <Link href={`/messages?network=${summary["network_address"]}`} className="text-[#27aab9]"> {summary["network_name"]}</Link><br/>
+            <Link href={`/messages?network=${summary["network_address"]}`} className="text-[#27aab9]"> {nMap[summary["network_address"]].name} ({nMap[summary["network_address"]].address})</Link><br/>
             <hr className={"my-3"}/>
-            <span>total message : {summary["status_total"]}</span><br/>
-            <span>in delivery : {summary["status_in_delivery"]}</span><br/>
-            <span>completed : {summary["status_completed"]}</span>
+            <span className="p-5">Total message : {summary["status_total"]}</span><br/>
+            <span className="p-5">In delivery : {summary["status_in_delivery"]}</span><br/>
+            <span className="p-5">Completed : {summary["status_completed"]}</span>
         </div>
     )
 }

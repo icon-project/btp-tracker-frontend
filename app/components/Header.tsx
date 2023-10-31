@@ -1,11 +1,11 @@
 'use client'
 import Link from "next/link";
 import "../globals.css";
-import {Summary} from "@/app/page";
 import {Portal} from "@/app/components/Portal";
 import React, {useState} from "react";
 import SearchForm from "@/app/components/SearchForm";
 import {usePathname} from "next/navigation";
+import {Summary} from "@/app/components/Summuries";
 
 export default function Header({networkOptions}: {networkOptions?: Summary[]}) {
     const title = <p className="text-5xl text-white bg-[#27aab9] text-center p-7">BTP Message Explorer</p>;

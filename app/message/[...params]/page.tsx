@@ -34,27 +34,27 @@ function MessageDetail({message}: { message: BTPMessage }) {
                 <tbody>
                 <tr className="bg-white border-2">
                     <th scope="col" className={headerClass}>
-                        src
+                        Source Network
                     </th>
                     <td scope="col" className={cellClass}>
                         {message.src}
                     </td>
+                    <th scope="row" className={headerClass}>
+                        Finalized
+                    </th>
+                    <td className={cellClass}>
+                        {message.finalized ? "True" : "False"}
+                    </td>
+                </tr>
+                <tr className="bg-white border-2">
                     <th scope="col" className={headerClass}>
-                        nsn
+                        Serial Number
                     </th>
                     <td scope="col" className={cellClass}>
                         {message.nsn}
                     </td>
-                </tr>
-                <tr className="bg-white border-2">
-                    <th scope="row" className={headerClass}>
-                        status
-                    </th>
-                    <td className={cellClass}>
-                        {message.status?.String}
-                    </td>
                     <th scope="col" className={headerClass}>
-                        last occurred
+                        Last occurred
                     </th>
                     <td className={cellClass}>
                         {message.last_network_address?.String}
@@ -62,13 +62,13 @@ function MessageDetail({message}: { message: BTPMessage }) {
                 </tr>
                 <tr className="bg-white border-2">
                     <th scope="row" className={headerClass}>
-                        finalized
+                        Status
                     </th>
                     <td className={cellClass}>
-                        {message.finalized ? "true" : "false"}
+                        {message.status?.String}
                     </td>
                     <th scope="col" className={headerClass}>
-                        last updated
+                        Last updated
                     </th>
                     <td scope="col" className={cellClass}>
                         {message.updated_at}
@@ -90,16 +90,19 @@ function EventList({events}: { events: BTPEvent[] }) {
                 <thead className="bg-gray-100">
                 <tr className="border-2">
                     <th scope="col" className={headerClass}>
-                        occurred at
+                        Event
                     </th>
                     <th scope="col" className={headerClass}>
-                        event
+                        Next
                     </th>
                     <th scope="col" className={headerClass}>
-                        next
+                        From
                     </th>
                     <th scope="col" className={headerClass}>
-                        created
+                        Finalized
+                    </th>
+                    <th scope="col" className={headerClass}>
+                        Created
                     </th>
                 </tr>
                 </thead>
@@ -109,13 +112,16 @@ function EventList({events}: { events: BTPEvent[] }) {
                         <>
                             <tr key={btpEvent.id} className="bg-white border-2">
                                 <td className={cellClass}>
-                                    {btpEvent.network_address}
-                                </td>
-                                <td className={cellClass}>
                                     {btpEvent.event}
                                 </td>
                                 <td className={cellClass}>
                                     {btpEvent.next}
+                                </td>
+                                <td className={cellClass}>
+                                    {btpEvent.network_address}
+                                </td>
+                                <td className={cellClass}>
+                                    {btpEvent.finalized ? "True" : "False"}
                                 </td>
                                 <td className={cellClass}>
                                     {btpEvent.created_at}
