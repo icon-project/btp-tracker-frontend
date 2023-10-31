@@ -14,9 +14,7 @@ import {
 } from "@tanstack/table-core";
 import {flexRender, useReactTable} from "@tanstack/react-table";
 import {QueryClient, QueryClientProvider, useQuery, UseQueryResult} from "react-query";
-import ImgInfoContext from "@/app/context";
-import ImgInfo, {NetworkMap, TrackerNetwork} from "@/app/ImgInfo";
-import ImgInfoContextProvider from "@/app/ImgInfo";
+import NetworkInfoContext from "@/app/context";
 
 interface BTPResponse {
     content: BTPMessage[],
@@ -46,7 +44,7 @@ async function fetchData(options: {
 }
 
 export function MessageTableWithFilter({networkOptions, selected}: { networkOptions: string[], selected: string }) {
-    const data = useContext(ImgInfoContext);
+    const data = useContext(NetworkInfoContext);
     return (
         <QueryClientProvider client={queryClient}>
             <FilterableMessageTable networkOptions={networkOptions} selected={selected}/>
@@ -188,17 +186,8 @@ function Table({tableInstance, statusOptions, srcOptions, selectedSrc}: {
 }
 
 function TableCell({cell, lastNetwork}: { cell: Cell<BTPMessage, any>, lastNetwork: any }) {
-    const c = useContext(ImgInfoContext);
-    if (!c) return <div></div>;
-    let nMap: NetworkMap = {};
-    c.map((net: TrackerNetwork) => (
-        nMap[net.address] = {
-            name: net.name,
-            address: net.address,
-            type: net.type,
-            imageBase64: net.imageBase64
-        }))
-
+    const networkMap = useContext(NetworkInfoContext);
+    if (Object.keys(networkMap).length === 0) return <td></td>;
     const cellClass = "pl-6 py-3";
     const imgCellClass = "flex items-center px-6 py-2 font-medium whitespace-nowrap";
     const value = cell.getValue() as string;
@@ -206,7 +195,7 @@ function TableCell({cell, lastNetwork}: { cell: Cell<BTPMessage, any>, lastNetwo
         <td key={cell.id} className={cell.column.id === 'src' ? imgCellClass : cellClass}>
             {(cell.column.id) === 'src' &&
                 <Image className="rounded-full" alt={value}
-                       src={`data:image/png;base64,${nMap[value].imageBase64}`} width={30} height={30}/> }
+                       src={`data:image/png;base64,${networkMap[value].imageBase64}`} width={30} height={30}/> }
 
             {flexRender(cell.column.columnDef.cell, cell.getContext())}
             {(cell.column.id) === "status" && (value === "ROUTE") &&

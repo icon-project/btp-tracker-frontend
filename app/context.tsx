@@ -1,7 +1,7 @@
 
 import {Context, createContext} from 'react';
-import {TrackerNetwork} from "@/app/ImgInfo";
+import {NetworkMap} from "@/app/NetworkInfo";
 
-const ImgInfoContext: Context<TrackerNetwork[]> = createContext([{"name":"", "address":"", "type":"", "imageBase64":""}]);
+const NetworkInfoContext: Context<NetworkMap> = createContext({});
 
-export default ImgInfoContext;
+export default NetworkInfoContext;
