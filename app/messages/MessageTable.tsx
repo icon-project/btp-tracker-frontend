@@ -15,6 +15,8 @@ import {
 import {flexRender, useReactTable} from "@tanstack/react-table";
 import {QueryClient, QueryClientProvider, useQuery, UseQueryResult} from "react-query";
 import NetworkInfoContext from "@/app/context";
+import moment from "moment";
+import {getElapsedTime} from "@/app/utils/util";
 
 interface BTPResponse {
     content: BTPMessage[],
@@ -78,14 +80,6 @@ function Columns() {
             {
                 header: "Status",
                 accessorKey: "status.String",
-            },
-            {
-                header: "Links",
-                accessorKey: "links.String",
-            },
-            {
-                header: "Finalized",
-                accessorKey: "finalized",
             },
             {
                 header: "Last network address",
@@ -185,22 +179,22 @@ function Table({tableInstance, statusOptions, srcOptions, selectedSrc}: {
     )
 }
 
-function TableCell({cell, lastNetwork, finalized}: { cell: Cell<BTPMessage, any>, lastNetwork: any, finalized: boolean }) {
+function TableCell({cell, lastNetwork}: { cell: Cell<BTPMessage, any>, lastNetwork: any }) {
     const networkMap = useContext(NetworkInfoContext);
     if (Object.keys(networkMap).length === 0) return <td></td>;
     const cellClass = "pl-6 py-3";
     const imgCellClass = "flex items-center px-6 py-2 font-medium whitespace-nowrap";
     const value = cell.getValue() as string;
+
     return (
         <td key={cell.id} className={cell.column.id === 'src' ? imgCellClass : cellClass}>
             {(cell.column.id) === 'src' &&
                 <Image className="rounded-full pr-2" alt={value}
                        src={`data:image/png;base64,${networkMap[value].imageBase64}`} width={30} height={30}/> }
-            {(cell.column.id) === "finalized"
-                ? <span>{finalized ? "True" : "False"}</span>
-                : flexRender(cell.column.columnDef.cell, cell.getContext())}
             {(cell.column.id) === "status" && (value === "ROUTE") &&
                 <span className="font-medium text-xs text-gray-400"> ({lastNetwork})</span>}
+            {(cell.column.id) == "updated_at" ?
+                <span>{getElapsedTime(value)}</span> : flexRender(cell.column.columnDef.cell, cell.getContext())}
         </td>
     )
 }
@@ -211,7 +205,7 @@ function TableRow({row}: { row: Row<BTPMessage> }) {
         <tr key={row.id} className="cursor-pointer bg-white border-2 hover:bg-gray-200" tabIndex={0}
             onClick={() => router.push(`/message/${row.original.id}`)}>
             {row.getVisibleCells().map(cell => (
-                <TableCell key={cell.id} cell={cell} finalized={row.original.finalized} lastNetwork={row.original.last_network_address}/>
+                <TableCell key={cell.id} cell={cell} lastNetwork={row.original.last_network_address}/>
             ))}
         </tr>
     )
@@ -238,16 +232,16 @@ function TableFooter({tableInstance, dataQuery}: {
     const pageLimitOptions = [25, 50, 100];
     return (
         <nav className="flex justify-between pt-4" aria-label="Table navigation">
-                        <span className="text-sm font-normal text-gray-400">show
-                            <select className="w-25 p-2 mb-6 text-xl text-gray-900 rounded-lg bg-white"
-                                    onChange={e => tableInstance.setPageSize(Number(e.target.value))}>
-                                {
-                                    pageLimitOptions.map((elem) =>
-                                        <option key={elem} value={elem}>{elem}</option>
-                                    )
-                                }
-                            </select>
-                        </span>
+            <span className="text-sm font-normal text-gray-400">show
+                <select className="w-25 p-2 mb-6 text-xl text-gray-900 rounded-lg bg-white"
+                    onChange={e => tableInstance.setPageSize(Number(e.target.value))}>
+                    {
+                        pageLimitOptions.map((elem) =>
+                            <option key={elem} value={elem}>{elem}</option>
+                        )
+                    }
+                </select>
+            </span>
             <ul className="flex h-8 text-sm">
                 <li>
                     <button className={linkClass} onClick={() => tableInstance.setPageIndex(0)}>&#60;&#60;</button>

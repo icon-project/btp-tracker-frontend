@@ -1,4 +1,5 @@
 import {BTPEvent, BTPMessage} from "@/app/data/BTPMessage";
+import {getElapsedTime} from "@/app/utils/util";
 
 export default async function Page({params}: { params: { params: string[] } }) {
     const p = params["params"];
@@ -6,24 +7,32 @@ export default async function Page({params}: { params: { params: string[] } }) {
     const reqUri = p.length == 1 ?
         `${process.env.API_URI}/tracker/bmc/status/${p[0]}?task=status`
         : `${process.env.API_URI}/tracker/bmc/search?query[src]=${p[0]}&query[nsn]=${p[1]}`;
-    const res = await fetch(reqUri);
-    console.log(res);
+    const res = await fetch(reqUri, {cache: 'no-store'});
     const message: BTPMessage = await res.json();
+    const links: number[] = JSON.parse(message.links.String);
+    // Array of BTPEVent
     const events: BTPEvent[] = message.btp_events!;
+    let btpMessageFinalized: boolean = true;
+    for (let i = 0; i < events.length; i++) {
+        if (!events[i].finalized) {
+            btpMessageFinalized = false;
+            break;
+        }
+    }
     return (
         <section>
             <h2 className="text-4xl text-center mt-7">BTP Message</h2>
             <div className="overflow-x-auto m-10 flex justify-center">
                 <div className="w-3/4 flex-col">
-                    <MessageDetail message={message}/>
-                    <EventList events={events}/>
+                    <MessageDetail message={message} finalized={btpMessageFinalized}/>
+                    <EventList events={events} links={links}/>
                 </div>
             </div>
         </section>
     )
 }
 
-function MessageDetail({message}: { message: BTPMessage }) {
+function MessageDetail({message, finalized}: { message: BTPMessage, finalized: boolean }) {
     const cellClass = "pl-2 py-2 font-light";
     const headerClass = cellClass + " bg-gray-100 text-gray-400";
     // @ts-ignore
@@ -40,10 +49,8 @@ function MessageDetail({message}: { message: BTPMessage }) {
                         {message.src}
                     </td>
                     <th scope="row" className={headerClass}>
-                        Finalized
                     </th>
                     <td className={cellClass}>
-                        {message.finalized ? "True" : "False"}
                     </td>
                 </tr>
                 <tr className="bg-white border-2">
@@ -65,13 +72,13 @@ function MessageDetail({message}: { message: BTPMessage }) {
                         Status
                     </th>
                     <td className={cellClass}>
-                        {message.status?.String}
+                        {message.status?.String} - Block({finalized ? "Finalized" : "Not Yet"})
                     </td>
                     <th scope="col" className={headerClass}>
                         Last updated
                     </th>
                     <td scope="col" className={cellClass}>
-                        {message.updated_at}
+                        {getElapsedTime(message.updated_at)}
                     </td>
                 </tr>
                 </tbody>
@@ -80,7 +87,7 @@ function MessageDetail({message}: { message: BTPMessage }) {
     );
 }
 
-function EventList({events}: { events: BTPEvent[] }) {
+function EventList({events, links}: { events: BTPEvent[], links: number[] }) {
     const cellClass = "pl-2 py-2 font-light";
     const headerClass = cellClass + " bg-gray-100 text-gray-400";
     return (
@@ -90,13 +97,13 @@ function EventList({events}: { events: BTPEvent[] }) {
                 <thead className="bg-gray-100">
                 <tr className="border-2">
                     <th scope="col" className={headerClass}>
+                        From
+                    </th>
+                    <th scope="col" className={headerClass}>
                         Event
                     </th>
                     <th scope="col" className={headerClass}>
                         Next
-                    </th>
-                    <th scope="col" className={headerClass}>
-                        From
                     </th>
                     <th scope="col" className={headerClass}>
                         Finalized
@@ -107,29 +114,34 @@ function EventList({events}: { events: BTPEvent[] }) {
                 </tr>
                 </thead>
                 <tbody>
-                {events && events.map(
-                    (btpEvent) => (
-                        <>
-                            <tr key={btpEvent.id} className="bg-white border-2">
-                                <td className={cellClass}>
-                                    {btpEvent.event}
-                                </td>
-                                <td className={cellClass}>
-                                    {btpEvent.next}
-                                </td>
-                                <td className={cellClass}>
-                                    {btpEvent.network_address}
-                                </td>
-                                <td className={cellClass}>
-                                    {btpEvent.finalized ? "True" : "False"}
-                                </td>
-                                <td className={cellClass}>
-                                    {btpEvent.created_at}
-                                </td>
-                            </tr>
-                        </>
+                {
+                    links && links.map(
+                        (link) => {
+                            return events && events.map((event) => {
+                                if (link == event.id)
+                                    return (<>
+                                        <tr key={event.id} className="bg-white border-2">
+                                            <td className={cellClass}>
+                                                {event.network_address}
+                                            </td>
+                                            <td className={cellClass}>
+                                                {event.event}
+                                            </td>
+                                            <td className={cellClass}>
+                                                {event.next}
+                                            </td>
+                                            <td className={cellClass}>
+                                                {event.finalized ? "Yes" : "Not Yet"}
+                                            </td>
+                                            <td className={cellClass}>
+                                                {getElapsedTime(event.created_at)}
+                                            </td>
+                                        </tr>
+                                    </>)
+                            })
+                        }
                     )
-                    )}
+                }
                 </tbody>
             </table>
         </>
