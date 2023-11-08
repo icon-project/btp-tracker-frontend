@@ -1,5 +1,6 @@
 import {BTPEvent, BTPMessage} from "@/app/data/BTPMessage";
 import {getElapsedTime} from "@/app/utils/util";
+import {boolean} from "zod";
 
 export default async function Page({params}: { params: { params: string[] } }) {
     const p = params["params"];
@@ -93,7 +94,7 @@ function EventList({events, links}: { events: BTPEvent[], links: number[] }) {
     return (
         <>
             <table className="w-full text-left">
-                <caption className="text-left text-lg text-gray-400 mb-2">Message delivery</caption>
+                <caption className="text-left text-lg text-gray-400 mb-2">Message Delivery - Connected</caption>
                 <thead className="bg-gray-100">
                 <tr className="border-2">
                     <th scope="col" className={headerClass}>
@@ -118,7 +119,7 @@ function EventList({events, links}: { events: BTPEvent[], links: number[] }) {
                     links && links.map(
                         (link) => {
                             return events && events.map((event) => {
-                                if (link == event.id)
+                                if (link === event.id)
                                     return (<>
                                         <tr key={event.id} className="bg-white border-2">
                                             <td className={cellClass}>
@@ -139,6 +140,61 @@ function EventList({events, links}: { events: BTPEvent[], links: number[] }) {
                                         </tr>
                                     </>)
                             })
+                        }
+                    )
+                }
+                </tbody>
+            </table>
+            <table className="w-full text-left">
+                <caption className="text-left text-lg text-gray-400 mb-2">Message Delivery - Not Connected</caption>
+                <thead className="bg-gray-100">
+                <tr className="border-2">
+                    <th scope="col" className={headerClass}>
+                        From
+                    </th>
+                    <th scope="col" className={headerClass}>
+                        Event
+                    </th>
+                    <th scope="col" className={headerClass}>
+                        Next
+                    </th>
+                    <th scope="col" className={headerClass}>
+                        Finalized
+                    </th>
+                    <th scope="col" className={headerClass}>
+                        Created
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                {
+                    events && events.map(
+                        (event) => {
+                            if(!Array.isArray(links)) {
+                                return (<></>)
+                            } else {
+                                if(!links.includes(event.id)){
+                                    return (<>
+                                        <tr key={event.id} className="bg-white border-2">
+                                            <td className={cellClass}>
+                                                {event.network_address}
+                                            </td>
+                                            <td className={cellClass}>
+                                                {event.event}
+                                            </td>
+                                            <td className={cellClass}>
+                                                {event.next}
+                                            </td>
+                                            <td className={cellClass}>
+                                                {event.finalized ? "Yes" : "Not Yet"}
+                                            </td>
+                                            <td className={cellClass}>
+                                                {getElapsedTime(event.created_at)}
+                                            </td>
+                                        </tr>
+                                    </>)
+                                }
+                            }
                         }
                     )
                 }
