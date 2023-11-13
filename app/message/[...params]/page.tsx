@@ -1,8 +1,13 @@
 import {BTPEvent, BTPMessage} from "@/app/data/BTPMessage";
-import {getElapsedTime} from "@/app/utils/util";
+import {getElapsedTime, getNetworkMap} from "@/app/utils/util";
 import {boolean} from "zod";
+import {NetworkMap} from "@/app/NetworkInfo";
+import Image from "next/image";
+import React from "react";
 
 export default async function Page({params}: { params: { params: string[] } }) {
+    const nMap: NetworkMap = await getNetworkMap();
+
     const p = params["params"];
     if (!p || p.length > 2 || p.length == 0) throw Error("invalid request. param length must be 1 or 2");
     const reqUri = p.length == 1 ?
@@ -10,31 +15,29 @@ export default async function Page({params}: { params: { params: string[] } }) {
         : `${process.env.API_URI}/tracker/bmc/search?query[src]=${p[0]}&query[nsn]=${p[1]}`;
     const res = await fetch(reqUri, {cache: 'no-store'});
     const message: BTPMessage = await res.json();
-    const links: number[] = JSON.parse(message.links.String);
+    const links: number[] = JSON.parse(message.links?.String);
     // Array of BTPEVent
     const events: BTPEvent[] = message.btp_events!;
-    let btpMessageFinalized: boolean = true;
-    for (let i = 0; i < events.length; i++) {
-        if (!events[i].finalized) {
-            btpMessageFinalized = false; break;
-        }
-    }
+    let btpMessageFinalized = events.every((event) => {
+        return event.finalized
+    })
     return (
         <section>
             <h2 className="text-4xl text-center mt-7">BTP Message Delivery</h2>
             <div className="overflow-x-auto m-10 flex justify-center">
                 <div className="w-3/4 flex-col">
-                    <MessageDetail message={message} finalized={btpMessageFinalized}/>
-                    <EventList events={events} links={links}/>
-                    <EventListUnlinked events={events} links={links}/>
+                    <MessageDetail message={message} finalized={btpMessageFinalized} nMap={nMap}/>
+                    <EventList events={events} links={links} nMap={nMap}/>
+                    <EventListUnlinked events={events} links={links} nMap={nMap}/>
                 </div>
             </div>
         </section>
     )
 }
 
-function MessageDetail({message, finalized}: { message: BTPMessage, finalized: boolean }) {
-    const cellClass = "pl-2 py-2 font-light";
+function MessageDetail({message, finalized, nMap}: { message: BTPMessage, finalized: boolean, nMap: NetworkMap }) {
+    const cellClass = "pl-7 py-2 font-light";
+    const imgCellClass = "flex items-center px-6 py-2 font-medium whitespace-nowrap";
     const headerClass = cellClass + " bg-gray-100 text-gray-400";
     // @ts-ignore
     return (
@@ -46,8 +49,10 @@ function MessageDetail({message, finalized}: { message: BTPMessage, finalized: b
                     <th scope="col" className={headerClass}>
                         Source Network
                     </th>
-                    <td scope="col" className={cellClass}>
-                        {message.src}
+                    <td scope="col" className={imgCellClass}>
+                        <Image className="rounded-full pr-2" alt={message.src}
+                               src={`data:image/png;base64,${nMap[message.src]?.imageBase64}`} width={30} height={30}/>
+                        { nMap[message.src].name + ' (' + message.src + ')'}
                     </td>
                     <th scope="row" className={headerClass}>
                     </th>
@@ -64,8 +69,10 @@ function MessageDetail({message, finalized}: { message: BTPMessage, finalized: b
                     <th scope="col" className={headerClass}>
                         Last occurred
                     </th>
-                    <td className={cellClass}>
-                        {message.last_network_address?.String}
+                    <td className={imgCellClass}>
+                        <Image className="rounded-full pr-2" alt={message.last_network_address?.String}
+                               src={`data:image/png;base64,${nMap[message.last_network_address?.String]?.imageBase64}`} width={30} height={30}/>
+                        { nMap[message.last_network_address?.String].name + ' (' + message.last_network_address?.String + ')'}
                     </td>
                 </tr>
                 <tr className="bg-white border-2">
@@ -88,8 +95,9 @@ function MessageDetail({message, finalized}: { message: BTPMessage, finalized: b
     );
 }
 
-function EventList({events, links}: { events: BTPEvent[], links: number[] }) {
+function EventList({events, links, nMap}: { events: BTPEvent[], links: number[], nMap: NetworkMap }) {
     const cellClass = "pl-2 py-2 font-light";
+    const imgCellClass = "flex items-center px-6 py-2 font-medium whitespace-nowrap";
     const headerClass = cellClass + " bg-gray-100 text-gray-400";
     return (
         <>
@@ -122,14 +130,20 @@ function EventList({events, links}: { events: BTPEvent[], links: number[] }) {
                                 if (link === event.id)
                                     return (<>
                                         <tr key={event.id} className="bg-white border-2">
-                                            <td className={cellClass}>
-                                                {event.network_address}
+                                            <td className={imgCellClass}>
+                                                <Image className="rounded-full pr-2" alt={event.network_address}
+                                                       src={`data:image/png;base64,${nMap[event.network_address]?.imageBase64}`} width={30} height={30}/>
+                                                { nMap[event.network_address].name + ' (' + event.network_address + ')'}
                                             </td>
                                             <td className={cellClass}>
                                                 {event.event}
                                             </td>
-                                            <td className={cellClass}>
-                                                {event.next}
+                                            <td className={imgCellClass}>
+                                                {
+                                                    event.next === '' ? '' : <Image className="rounded-full pr-2" alt={event.next}
+                                                                                    src={`data:image/png;base64,${nMap[event.next]?.imageBase64}`} width={30} height={30} />
+                                                }
+                                                { event.next === '' ? '' : nMap[event.next].name + ' (' + event.next + ')'}
                                             </td>
                                             <td className={cellClass}>
                                                 {event.finalized ? "Yes" : "Not Yet"}
@@ -149,8 +163,9 @@ function EventList({events, links}: { events: BTPEvent[], links: number[] }) {
     )
 }
 
-function EventListUnlinked({events, links}: { events: BTPEvent[], links: number[] }) {
+function EventListUnlinked({events, links, nMap}: { events: BTPEvent[], links: number[], nMap: NetworkMap }) {
     const cellClass = "pl-2 py-2 font-light";
+    const imgCellClass = "flex items-center px-6 py-2 font-medium whitespace-nowrap";
     const headerClass = cellClass + " bg-gray-100 text-gray-400";
     if(!events.some((event) => {return !links.includes(event.id)})) {
         return (<></>);
@@ -187,16 +202,23 @@ function EventListUnlinked({events, links}: { events: BTPEvent[], links: number[
                                 return (<></>)
                             } else {
                                 if(!links.includes(event.id)){
+                                    console.log("EVENT: ", event)
                                     return (<>
                                         <tr key={event.id} className="bg-white border-2">
-                                            <td className={cellClass}>
-                                                {event.network_address}
+                                            <td className={imgCellClass}>
+                                                <Image className="rounded-full pr-2" alt={event.network_address}
+                                                       src={`data:image/png;base64,${nMap[event.network_address]?.imageBase64}`} width={30} height={30}/>
+                                                { nMap[event.network_address].name + ' (' + event.network_address + ')'}
                                             </td>
                                             <td className={cellClass}>
                                                 {event.event}
                                             </td>
-                                            <td className={cellClass}>
-                                                {event.next}
+                                            <td className={imgCellClass}>
+                                                {
+                                                    event.next === '' ? '' : <Image className="rounded-full pr-2" alt={event.next}
+                                                                                    src={`data:image/png;base64,${nMap[event.next]?.imageBase64}`} width={30} height={30} />
+                                                }
+                                                { event.next === '' ? '' : nMap[event.next].name + ' (' + event.next + ')'}
                                             </td>
                                             <td className={cellClass}>
                                                 {event.finalized ? "Yes" : "Not Yet"}

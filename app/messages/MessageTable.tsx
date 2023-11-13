@@ -189,8 +189,9 @@ function TableCell({cell}: { cell: Cell<BTPMessage, any>}) {
             {(cell.column.id === 'src' || cell.column.id === 'last_network_address_String') &&
                 <Image className="rounded-full pr-2" alt={value}
                        src={`data:image/png;base64,${nMap[value].imageBase64}`} width={30} height={30}/> }
-            {(cell.column.id) === "updated_at" ?
-                <span>{getElapsedTime(value)}</span> : flexRender(cell.column.columnDef.cell, cell.getContext())}
+            {(cell.column.id === 'src' || cell.column.id === 'last_network_address_String') && `${nMap[value].name+' (' + value + ')'}`   }
+            {(cell.column.id) === "updated_at" ? <span>{getElapsedTime(value)}</span> : ''}
+            {(cell.column.id === 'nsn' || cell.column.id === 'status_String') && flexRender(cell.column.columnDef.cell, cell.getContext()) }
         </td>
     )
 }

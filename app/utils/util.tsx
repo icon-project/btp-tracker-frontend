@@ -1,4 +1,7 @@
 import moment from "moment/moment";
+import {useEffect} from "react";
+import NetworkInfoContext from "@/app/context";
+import {NetworkMap, TrackerNetwork} from "@/app/NetworkInfo";
 
 export function getElapsedTime(uTime: string) {
     const M = 60
@@ -57,4 +60,19 @@ export function makeFromNowText(fistTime: number, firstText: string, secondTime:
     }
 
     return result.join(" ")
+}
+
+export async function getNetworkMap() {
+    const reqUri = `${process.env.NEXT_PUBLIC_API_URI}/tracker/bmc/network`;
+    const res = await fetch(reqUri, {cache: 'no-store'});
+    const message = await res.json();
+    let nMap: NetworkMap = {};
+    message.map((net: TrackerNetwork) => (
+        nMap[net.address] = {
+            name: net.name,
+            address: net.address,
+            type: net.type,
+            imageBase64: net.imageBase64
+        }))
+    return nMap;
 }

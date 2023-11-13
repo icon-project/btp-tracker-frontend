@@ -1,5 +1,3 @@
-import Link from "next/link";
-import Image from "next/image";
 import RefreshingTable from "@/app/components/RefreshingTable";
 import SearchForm from "@/app/components/SearchForm";
 import Summaries from "@/app/components/Summuries";
