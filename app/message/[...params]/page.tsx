@@ -16,17 +16,17 @@ export default async function Page({params}: { params: { params: string[] } }) {
     let btpMessageFinalized: boolean = true;
     for (let i = 0; i < events.length; i++) {
         if (!events[i].finalized) {
-            btpMessageFinalized = false;
-            break;
+            btpMessageFinalized = false; break;
         }
     }
     return (
         <section>
-            <h2 className="text-4xl text-center mt-7">BTP Message</h2>
+            <h2 className="text-4xl text-center mt-7">BTP Message Delivery</h2>
             <div className="overflow-x-auto m-10 flex justify-center">
                 <div className="w-3/4 flex-col">
                     <MessageDetail message={message} finalized={btpMessageFinalized}/>
                     <EventList events={events} links={links}/>
+                    <EventListUnlinked events={events} links={links}/>
                 </div>
             </div>
         </section>
@@ -40,7 +40,7 @@ function MessageDetail({message, finalized}: { message: BTPMessage, finalized: b
     return (
         <>
             <table className="w-full text-left mb-10 table-fixed">
-                <caption className="text-left text-lg text-gray-400 mb-2">Message</caption>
+                <caption className="text-left text-lg text-gray-400 mb-2">Message Delivery Status</caption>
                 <tbody>
                 <tr className="bg-white border-2">
                     <th scope="col" className={headerClass}>
@@ -76,7 +76,7 @@ function MessageDetail({message, finalized}: { message: BTPMessage, finalized: b
                         {message.status?.String} - Block({finalized ? "Finalized" : "Not Yet"})
                     </td>
                     <th scope="col" className={headerClass}>
-                        Last updated
+                        Last Updated
                     </th>
                     <td scope="col" className={cellClass}>
                         {getElapsedTime(message.updated_at)}
@@ -93,8 +93,8 @@ function EventList({events, links}: { events: BTPEvent[], links: number[] }) {
     const headerClass = cellClass + " bg-gray-100 text-gray-400";
     return (
         <>
-            <table className="w-full text-left">
-                <caption className="text-left text-lg text-gray-400 mb-2">Message Delivery - Connected</caption>
+            <table className="w-full text-left mb-10">
+                <caption className="text-left text-lg text-gray-400 mb-2">Message Delivery Events - Linked</caption>
                 <thead className="bg-gray-100">
                 <tr className="border-2">
                     <th scope="col" className={headerClass}>
@@ -110,7 +110,7 @@ function EventList({events, links}: { events: BTPEvent[], links: number[] }) {
                         Finalized
                     </th>
                     <th scope="col" className={headerClass}>
-                        Created
+                        Updated
                     </th>
                 </tr>
                 </thead>
@@ -145,8 +145,21 @@ function EventList({events, links}: { events: BTPEvent[], links: number[] }) {
                 }
                 </tbody>
             </table>
+        </>
+    )
+}
+
+function EventListUnlinked({events, links}: { events: BTPEvent[], links: number[] }) {
+    const cellClass = "pl-2 py-2 font-light";
+    const headerClass = cellClass + " bg-gray-100 text-gray-400";
+    if(!events.some((event) => {return !links.includes(event.id)})) {
+        return (<></>);
+    }
+
+    return (
+        <>
             <table className="w-full text-left">
-                <caption className="text-left text-lg text-gray-400 mb-2">Message Delivery - Not Connected</caption>
+                <caption className="text-left text-lg text-gray-400 mb-2">Message Delivery Events - Unlinked</caption>
                 <thead className="bg-gray-100">
                 <tr className="border-2">
                     <th scope="col" className={headerClass}>
@@ -162,7 +175,7 @@ function EventList({events, links}: { events: BTPEvent[], links: number[] }) {
                         Finalized
                     </th>
                     <th scope="col" className={headerClass}>
-                        Created
+                        Updated
                     </th>
                 </tr>
                 </thead>
