@@ -1,6 +1,6 @@
 'use client'
 import {usePathname, useRouter} from "next/navigation";
-import {useContext} from "react";
+import React, {useContext} from "react";
 import {Summary} from "@/app/components/Summuries";
 import NetworkInfoContext from "@/app/context";
 
@@ -17,17 +17,18 @@ export default function SearchForm({options, onSubmitAction}: {options?: Summary
         router.push(`/message/${net}/${nsn}`);
         if (!!onSubmitAction) onSubmitAction();
     }
+
     return (
             <form className={"flex w-full justify-center"} onSubmit={onSubmit}>
-                <select className="text-xl bg-[#85dbe5] border border-[#27aab9] rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 text-white mr-1" id={"searchSelect"}>
+                <select className="text-xl bg-[#85dbe5] border border-[#27aab9] rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 text-black mr-1" id={"searchSelect"}>
                     {options && options.map((option) => (
                         <option key={option.network_address} value={option.network_address}>
-                            {nMap[option.network_address]?.name}
+                            {nMap[option.network_address]?.name} ({option.network_address})
                         </option>
                     ))}
                 </select>
                 <input type="text" pattern="0|[1-9][0-9]*"
-                       className="bg-[#85dbe5] rounded-lg block pl-10 p-2.5 focus:bg-[#f0ffff] w-1/4 mr-1 placeholder:text-2xl placeholder:text-gray-150"
+                       className="bg-[#85dbe5] rounded-lg block pl-10 pt-3 p-2.5 content-center focus:bg-[#f0ffff] w-1/4 mr-1 placeholder:text-xl placeholder:text-black"
                        placeholder="Network Serial Number"
                        required
                        id={"searchInput"}

@@ -29,9 +29,22 @@ function Summary({summary}: { summary: Summary }) {
                alt={summary["network_address"]} width={30} height={30}/>
             <Link href={`/messages?network=${summary["network_address"]}`} className="text-[#27aab9]"> {nMap[summary["network_address"]].name} ({nMap[summary["network_address"]].address})</Link><br/>
             <hr className={"my-3"}/>
-            <span className="p-5">Total Message : {summary["status_total"]}</span><br/>
-            <span className="p-5">In Delivery : {summary["status_in_delivery"]}</span><br/>
-            <span className="p-5">Completed : {summary["status_completed"]}</span>
+            <table className="text-right">
+                <tbody>
+                <tr>
+                    <td>Total Message :</td>
+                    <td>{summary["status_total"]}</td>
+                </tr>
+                <tr>
+                    <td>In Delivery :</td>
+                    <td>{summary["status_in_delivery"]}</td>
+                </tr>
+                <tr>
+                    <td>Completed :</td>
+                    <td>{summary["status_completed"]}</td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     )
 }
