@@ -35,7 +35,7 @@ async function fetchData(options: {
     pageSize: number,
     columnFilters: ColumnFiltersState
 }): Promise<BTPResponse> {
-    const filterNames = ["Source Network", "Status"];
+    const filterNames = ["src", "Status"];
     const srcFilter = options.columnFilters[0];
     const statusFilter = options.columnFilters[1];
     const filterQuery = `${filterNames.filter(n => n == srcFilter.value).length == 0 ? "&query[src]=" + srcFilter.value : ""}${!!statusFilter && filterNames.filter(n => n == statusFilter.value).length == 0 ? "&query[status]=" + statusFilter.value : ""}`;
@@ -69,7 +69,7 @@ function Columns() {
     return React.useMemo(
         () => [
             {
-                header: "Source Network",
+                header: "src",
                 accessorKey: "src",
             },
             {
@@ -208,11 +208,14 @@ function TableRow({row}: { row: Row<BTPMessage> }) {
 }
 
 function ColumnFilter({options, column, defaultValue}: { options: string[], column: Column<any>, defaultValue?: string}) {
+    const nMap = useContext(NetworkInfoContext);
+    //TODO
     return (
         <select onChange={e => column.setFilterValue(e.target.value)} defaultValue={defaultValue}>
             {
+
                 options.map((elem) =>
-                    <option key={elem} value={elem} className={"text-xs font-light"}>{elem}</option>
+                    <option key={elem} value={elem} className={"text-xs font-light"}>{getNetworkName(nMap, elem)}</option>
                 )
             }
         </select>

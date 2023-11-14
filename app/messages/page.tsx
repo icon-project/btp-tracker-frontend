@@ -1,10 +1,11 @@
 import React from "react";
 import {MessageTableWithFilter} from "@/app/messages/MessageTable";
 import {Summary} from "@/app/components/Summuries";
+import {getNetworkOptions} from "@/app/utils/util";
 export default async function Page({searchParams}: {searchParams: {[key: string]: string | string[] | undefined}}) {
     try {
         const networkOptions = await getNetworkOptions();
-        let net = networkOptions.filter(m => searchParams["network"] == m)[0] ?? "Source Network";
+        let net = networkOptions.filter(m => searchParams["network"] == m)[0] ?? "src";
         return (
             <Container>
                 <MessageTableWithFilter networkOptions={networkOptions} selected={net}/>
@@ -26,13 +27,4 @@ function Container({children}: {children?: React.ReactNode}) {
             </div>
         </section>
     )
-}
-
-export async function getNetworkOptions() {
-    const summaryRes = await fetch(`${process.env.API_URI}/tracker/bmc/summary`, {cache: 'no-store'});
-    const summaryJson = await summaryRes.json();
-    const summaries = summaryJson as Summary[];
-    const options: string[] = ["Source Network"];
-    for (let i = 0; i < summaries.length; i++) options.push(summaries[i].network_address);
-    return options;
 }

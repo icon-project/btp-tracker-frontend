@@ -10,9 +10,8 @@ export default async function Page({params}: { params: { params: string[] } }) {
 
     const p = params["params"];
     if (!p || p.length > 2 || p.length == 0) throw Error("invalid request. param length must be 1 or 2");
-    const reqUri = p.length == 1 ?
-        `${process.env.API_URI}/tracker/bmc/status/${p[0]}?task=status`
-        : `${process.env.API_URI}/tracker/bmc/search?query[src]=${p[0]}&query[nsn]=${p[1]}`;
+    const reqUri = p.length == 1 ? `${process.env.API_URI}/tracker/bmc/status/${p[0]}?task=status` :
+        `${process.env.API_URI}/tracker/bmc/search?query[src]=${p[0]}&query[nsn]=${p[1]}`;
     const res = await fetch(reqUri, {cache: 'no-store'});
     const message: BTPMessage = await res.json();
     const links: number[] = JSON.parse(message.links?.String);
@@ -50,8 +49,7 @@ function MessageDetail({message, finalized, nMap}: { message: BTPMessage, finali
                         Source Network
                     </th>
                     <td scope="col" className={imgCellClass}>
-                        <Image className="rounded-full pr-2" alt={message.src}
-                               src={`data:image/png;base64,${getNetworkIcon(nMap, message.src)}`} width={30} height={30}/>
+                        <Image className="rounded-full pr-2" alt={message.src} src={`data:image/png;base64,${getNetworkIcon(nMap, message.src)}`} width={30} height={30}/>
                         {getNetworkName(nMap, message.src)}
                     </td>
                     <th scope="row" className={headerClass}>
@@ -70,8 +68,7 @@ function MessageDetail({message, finalized, nMap}: { message: BTPMessage, finali
                         Last occurred
                     </th>
                     <td className={imgCellClass}>
-                        <Image className="rounded-full pr-2" alt={message.last_network_address?.String}
-                               src={`data:image/png;base64,${getNetworkIcon(nMap, message.last_network_address?.String)}`} width={30} height={30}/>
+                        <Image className="rounded-full pr-2" alt={message.last_network_address?.String} src={`data:image/png;base64,${getNetworkIcon(nMap, message.last_network_address?.String)}`} width={30} height={30}/>
                         {getNetworkName(nMap, message.last_network_address?.String)}
                     </td>
                 </tr>
@@ -139,8 +136,7 @@ function EventList({events, links, nMap}: { events: BTPEvent[], links: number[],
                                                 {event.event}
                                             </td>
                                             <td className={imgCellClass}>
-                                                {event.next === '' ? '' :
-                                                    <Image className="rounded-full pr-2" alt={event.next} src={`data:image/png;base64,${getNetworkIcon(nMap, event.next)}`} width={30} height={30} />}
+                                                {event.next !== '' ? <Image className="rounded-full pr-2" alt={event.next} src={`data:image/png;base64,${getNetworkIcon(nMap, event.next)}`} width={30} height={30} /> : ''}
                                                 {getNetworkName(nMap, event.next)}
                                             </td>
                                             <td className={cellClass}>
