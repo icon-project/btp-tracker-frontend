@@ -3,6 +3,7 @@ import {usePathname, useRouter} from "next/navigation";
 import React, {useContext} from "react";
 import {Summary} from "@/app/components/Summuries";
 import NetworkInfoContext from "@/app/context";
+import {getNetworkName} from "@/app/utils/util";
 
 export default function SearchForm({options, onSubmitAction}: {options?: Summary[], onSubmitAction?: () => void}) {
     const nMap = useContext(NetworkInfoContext);
@@ -23,7 +24,7 @@ export default function SearchForm({options, onSubmitAction}: {options?: Summary
                 <select className="text-xl bg-[#85dbe5] border border-[#27aab9] rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 text-black mr-1" id={"searchSelect"}>
                     {options && options.map((option) => (
                         <option key={option.network_address} value={option.network_address}>
-                            {nMap[option.network_address]?.name} ({option.network_address})
+                            {getNetworkName(nMap, option.network_address)}
                         </option>
                     ))}
                 </select>

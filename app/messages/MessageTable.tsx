@@ -15,7 +15,7 @@ import {
 import {flexRender, useReactTable} from "@tanstack/react-table";
 import {QueryClient, QueryClientProvider, useQuery, UseQueryResult} from "react-query";
 import NetworkInfoContext from "@/app/context";
-import {getElapsedTime} from "@/app/utils/util";
+import {getElapsedTime, getNetworkIcon, getNetworkName} from "@/app/utils/util";
 
 interface BTPResponse {
     content: BTPMessage[],
@@ -187,11 +187,10 @@ function TableCell({cell}: { cell: Cell<BTPMessage, any>}) {
     return (
         <td key={cell.id} className={(cell.column.id === 'src') || (cell.column.id === 'last_network_address_String') ? imgCellClass : cellClass}>
             {(cell.column.id === 'src' || cell.column.id === 'last_network_address_String') &&
-                <Image className="rounded-full pr-2" alt={value}
-                       src={`data:image/png;base64,${nMap[value].imageBase64}`} width={30} height={30}/> }
-            {(cell.column.id === 'src' || cell.column.id === 'last_network_address_String') && `${nMap[value].name+' (' + value + ')'}`   }
-            {(cell.column.id) === "updated_at" ? <span>{getElapsedTime(value)}</span> : ''}
+                <Image className="rounded-full pr-2" alt={value} src={`data:image/png;base64,${getNetworkIcon(nMap, value)}`} width={30} height={30}/> }
+            {(cell.column.id === 'src' || cell.column.id === 'last_network_address_String') && `${getNetworkName(nMap, value)}` }
             {(cell.column.id === 'nsn' || cell.column.id === 'status_String') && flexRender(cell.column.columnDef.cell, cell.getContext()) }
+            {(cell.column.id) === "updated_at" ? <span>{getElapsedTime(value)}</span> : ''}
         </td>
     )
 }

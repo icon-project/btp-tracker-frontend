@@ -76,3 +76,17 @@ export async function getNetworkMap() {
         }))
     return nMap;
 }
+
+export function getNetworkName(nMap: NetworkMap, address: string) {
+    if(Object.keys(nMap).length === 0 || !address) {
+        return '';
+    }
+    return nMap[address].name + ' (' + address + ')';
+}
+
+export function getNetworkIcon(nMap: NetworkMap, address: string){
+    if(Object.keys(nMap).length === 0 || !address) {
+        return '';
+    }
+    return nMap[address].imageBase64;
+}

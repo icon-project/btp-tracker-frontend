@@ -1,5 +1,5 @@
 import {BTPEvent, BTPMessage} from "@/app/data/BTPMessage";
-import {getElapsedTime, getNetworkMap} from "@/app/utils/util";
+import {getElapsedTime, getNetworkIcon, getNetworkMap, getNetworkName} from "@/app/utils/util";
 import {boolean} from "zod";
 import {NetworkMap} from "@/app/NetworkInfo";
 import Image from "next/image";
@@ -51,8 +51,8 @@ function MessageDetail({message, finalized, nMap}: { message: BTPMessage, finali
                     </th>
                     <td scope="col" className={imgCellClass}>
                         <Image className="rounded-full pr-2" alt={message.src}
-                               src={`data:image/png;base64,${nMap[message.src]?.imageBase64}`} width={30} height={30}/>
-                        { nMap[message.src].name + ' (' + message.src + ')'}
+                               src={`data:image/png;base64,${getNetworkIcon(nMap, message.src)}`} width={30} height={30}/>
+                        {getNetworkName(nMap, message.src)}
                     </td>
                     <th scope="row" className={headerClass}>
                     </th>
@@ -71,8 +71,8 @@ function MessageDetail({message, finalized, nMap}: { message: BTPMessage, finali
                     </th>
                     <td className={imgCellClass}>
                         <Image className="rounded-full pr-2" alt={message.last_network_address?.String}
-                               src={`data:image/png;base64,${nMap[message.last_network_address?.String]?.imageBase64}`} width={30} height={30}/>
-                        { nMap[message.last_network_address?.String].name + ' (' + message.last_network_address?.String + ')'}
+                               src={`data:image/png;base64,${getNetworkIcon(nMap, message.last_network_address?.String)}`} width={30} height={30}/>
+                        {getNetworkName(nMap, message.last_network_address?.String)}
                     </td>
                 </tr>
                 <tr className="bg-white border-2">
@@ -132,18 +132,16 @@ function EventList({events, links, nMap}: { events: BTPEvent[], links: number[],
                                         <tr key={event.id} className="bg-white border-2">
                                             <td className={imgCellClass}>
                                                 <Image className="rounded-full pr-2" alt={event.network_address}
-                                                       src={`data:image/png;base64,${nMap[event.network_address]?.imageBase64}`} width={30} height={30}/>
-                                                { nMap[event.network_address].name + ' (' + event.network_address + ')'}
+                                                       src={`data:image/png;base64,${getNetworkIcon(nMap, event.network_address)}`} width={30} height={30}/>
+                                                {getNetworkName(nMap, event.network_address)}
                                             </td>
                                             <td className={cellClass}>
                                                 {event.event}
                                             </td>
                                             <td className={imgCellClass}>
-                                                {
-                                                    event.next === '' ? '' : <Image className="rounded-full pr-2" alt={event.next}
-                                                                                    src={`data:image/png;base64,${nMap[event.next]?.imageBase64}`} width={30} height={30} />
-                                                }
-                                                { event.next === '' ? '' : nMap[event.next].name + ' (' + event.next + ')'}
+                                                {event.next === '' ? '' :
+                                                    <Image className="rounded-full pr-2" alt={event.next} src={`data:image/png;base64,${getNetworkIcon(nMap, event.next)}`} width={30} height={30} />}
+                                                {getNetworkName(nMap, event.next)}
                                             </td>
                                             <td className={cellClass}>
                                                 {event.finalized ? "Yes" : "Not Yet"}
@@ -202,23 +200,20 @@ function EventListUnlinked({events, links, nMap}: { events: BTPEvent[], links: n
                                 return (<></>)
                             } else {
                                 if(!links.includes(event.id)){
-                                    console.log("EVENT: ", event)
                                     return (<>
                                         <tr key={event.id} className="bg-white border-2">
                                             <td className={imgCellClass}>
                                                 <Image className="rounded-full pr-2" alt={event.network_address}
-                                                       src={`data:image/png;base64,${nMap[event.network_address]?.imageBase64}`} width={30} height={30}/>
-                                                { nMap[event.network_address].name + ' (' + event.network_address + ')'}
+                                                       src={`data:image/png;base64,${getNetworkIcon(nMap, event.network_address)}`} width={30} height={30}/>
+                                                {getNetworkName(nMap, event.network_address)}
                                             </td>
                                             <td className={cellClass}>
                                                 {event.event}
                                             </td>
                                             <td className={imgCellClass}>
-                                                {
-                                                    event.next === '' ? '' : <Image className="rounded-full pr-2" alt={event.next}
-                                                                                    src={`data:image/png;base64,${nMap[event.next]?.imageBase64}`} width={30} height={30} />
-                                                }
-                                                { event.next === '' ? '' : nMap[event.next].name + ' (' + event.next + ')'}
+                                                {event.next === '' ? '' :
+                                                    <Image className="rounded-full pr-2" alt={event.next} src={`data:image/png;base64,${getNetworkIcon(nMap, event.next)}`} width={30} height={30} />}
+                                                {getNetworkName(nMap, event.next)}
                                             </td>
                                             <td className={cellClass}>
                                                 {event.finalized ? "Yes" : "Not Yet"}
