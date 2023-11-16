@@ -1,8 +1,10 @@
 import moment from "moment/moment";
-import {useEffect} from "react";
-import NetworkInfoContext from "@/app/context";
 import {NetworkMap, TrackerNetwork} from "@/app/NetworkInfo";
 import {Summary} from "@/app/components/Summuries";
+
+export const GV = {
+    SOURCE_NETWORK: 'Source Network'
+}
 
 export function getElapsedTime(uTime: string) {
     const M = 60
@@ -78,11 +80,15 @@ export async function getNetworkMap() {
     return nMap;
 }
 
+const COL = {
+    SRC: 'src'
+}
+
 export function getNetworkName(nMap: NetworkMap, address: string) {
     if(Object.keys(nMap).length === 0 || !address) {
         return '';
     }
-    if(address === 'src') {
+    if(address === COL.SRC) {
         return 'Source Network (All)';
     }
     return nMap[address]?.name + ' (' + address + ')';
@@ -99,7 +105,8 @@ export async function getNetworkOptions() {
     const summaryRes = await fetch(`${process.env.API_URI}/tracker/bmc/summary`, {cache: 'no-store'});
     const summaryJson = await summaryRes.json();
     const summaries = summaryJson as Summary[];
-    const options: string[] = ["src"];
+    const options: string[] = [COL.SRC];
     for (let i = 0; i < summaries.length; i++) options.push(summaries[i].network_address);
     return options;
 }
+

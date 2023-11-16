@@ -1,5 +1,5 @@
 import {BTPEvent, BTPMessage} from "@/app/data/BTPMessage";
-import {getElapsedTime, getNetworkIcon, getNetworkMap, getNetworkName} from "@/app/utils/util";
+import {GV, getElapsedTime, getNetworkIcon, getNetworkMap, getNetworkName} from "@/app/utils/util";
 import {boolean} from "zod";
 import {NetworkMap} from "@/app/NetworkInfo";
 import Image from "next/image";
@@ -46,7 +46,7 @@ function MessageDetail({message, finalized, nMap}: { message: BTPMessage, finali
                 <tbody>
                 <tr className="bg-white border-2">
                     <th scope="col" className={headerClass}>
-                        Source Network
+                        {GV.SOURCE_NETWORK}
                     </th>
                     <td scope="col" className={imgCellClass}>
                         <Image className="rounded-full pr-2" alt={message.src} src={`data:image/png;base64,${getNetworkIcon(nMap, message.src)}`} width={30} height={30}/>
@@ -59,7 +59,7 @@ function MessageDetail({message, finalized, nMap}: { message: BTPMessage, finali
                 </tr>
                 <tr className="bg-white border-2">
                     <th scope="col" className={headerClass}>
-                        Serial Number
+                        Network Serial Number
                     </th>
                     <td scope="col" className={cellClass}>
                         {message.nsn}

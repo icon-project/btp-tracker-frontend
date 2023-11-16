@@ -15,7 +15,7 @@ import {
 import {flexRender, useReactTable} from "@tanstack/react-table";
 import {QueryClient, QueryClientProvider, useQuery, UseQueryResult} from "react-query";
 import NetworkInfoContext from "@/app/context";
-import {getElapsedTime, getNetworkIcon, getNetworkName} from "@/app/utils/util";
+import {getElapsedTime, getNetworkIcon, getNetworkName, GV} from "@/app/utils/util";
 
 interface BTPResponse {
     content: BTPMessage[],
@@ -69,11 +69,11 @@ function Columns() {
     return React.useMemo(
         () => [
             {
-                header: "src",
+                header: GV.SOURCE_NETWORK,
                 accessorKey: "src",
             },
             {
-                header: "Serial Number",
+                header: "Network Serial Number",
                 accessorKey: "nsn",
             },
             {
@@ -159,7 +159,7 @@ function Table({tableInstance, statusOptions, srcOptions, selectedSrc}: {
                         {headerGroup.headers.map(header => (
                             <th key={header.id} scope="col" className="pl-6 py-1 font-medium">
                                 {header.column.id === "src" && !!srcOptions &&
-                                    <ColumnFilter column={header.column} options={srcOptions} defaultValue={selectedSrc}/>}
+                                    <ColumnFilter column={header.column} options={srcOptions} defaultValue={selectedSrc}/> }
                                 {header.column.id === "status" && !!statusOptions &&
                                     <ColumnFilter column={header.column} options={statusOptions}/>}
                                 {header.column.id === "src" && !!srcOptions || header.column.id === "status" && !!statusOptions || flexRender(header.column.columnDef.header, header.getContext())}
@@ -209,16 +209,17 @@ function TableRow({row}: { row: Row<BTPMessage> }) {
 
 function ColumnFilter({options, column, defaultValue}: { options: string[], column: Column<any>, defaultValue?: string}) {
     const nMap = useContext(NetworkInfoContext);
-    //TODO
     return (
+        <>
+        {column.columnDef.header}
+        <br/>
         <select onChange={e => column.setFilterValue(e.target.value)} defaultValue={defaultValue}>
-            {
-
-                options.map((elem) =>
-                    <option key={elem} value={elem} className={"text-xs font-light"}>{getNetworkName(nMap, elem)}</option>
-                )
-            }
+        {options.map((elem) => <option key={elem} value={elem} className='text-xs font-light'>{
+                column.columnDef.header === GV.SOURCE_NETWORK ? getNetworkName(nMap, elem) : elem
+            }</option>
+        )}
         </select>
+        </>
     )
 }
 
