@@ -1,6 +1,5 @@
 import {BTPEvent, BTPMessage} from "@/app/data/BTPMessage";
 import {GV, getElapsedTime, getNetworkIcon, getNetworkMap, getNetworkName} from "@/app/utils/util";
-import {boolean} from "zod";
 import {NetworkMap} from "@/app/NetworkInfo";
 import Image from "next/image";
 import React from "react";

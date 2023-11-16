@@ -15,7 +15,7 @@ import {
 import {flexRender, useReactTable} from "@tanstack/react-table";
 import {QueryClient, QueryClientProvider, useQuery, UseQueryResult} from "react-query";
 import NetworkInfoContext from "@/app/context";
-import {getElapsedTime, getNetworkIcon, getNetworkName, GV} from "@/app/utils/util";
+import {getElapsedTime, getNetworkIcon, getNetworkName, GV, COL} from "@/app/utils/util";
 
 interface BTPResponse {
     content: BTPMessage[],
@@ -35,7 +35,7 @@ async function fetchData(options: {
     pageSize: number,
     columnFilters: ColumnFiltersState
 }): Promise<BTPResponse> {
-    const filterNames = ["src", "Status"];
+    const filterNames = [COL.SRC, COL.STATUS];
     const srcFilter = options.columnFilters[0];
     const statusFilter = options.columnFilters[1];
     const filterQuery = `${filterNames.filter(n => n == srcFilter.value).length == 0 ? "&query[src]=" + srcFilter.value : ""}${!!statusFilter && filterNames.filter(n => n == statusFilter.value).length == 0 ? "&query[status]=" + statusFilter.value : ""}`;
@@ -45,7 +45,6 @@ async function fetchData(options: {
 }
 
 export function MessageTableWithFilter({networkOptions, selected}: { networkOptions: string[], selected: string }) {
-    const data = useContext(NetworkInfoContext);
     return (
         <QueryClientProvider client={queryClient}>
             <FilterableMessageTable networkOptions={networkOptions} selected={selected}/>
@@ -95,7 +94,7 @@ function Columns() {
 }
 
 function FilterableMessageTable({networkOptions, selected}: { networkOptions: string[], selected: string}) {
-    const statusOptions = ["status", "SEND", "RECEIVE", "ROUTE", "ERROR", "REPLY", "DROP"];
+    const statusOptions = [COL.STATUS, "In Delivery", "Completed"];
     const [{pageIndex, pageSize}, setPagination] =
         React.useState<PaginationState>({
             pageIndex: 0,
@@ -160,9 +159,9 @@ function Table({tableInstance, statusOptions, srcOptions, selectedSrc}: {
                             <th key={header.id} scope="col" className="pl-6 py-1 font-medium">
                                 {header.column.id === "src" && !!srcOptions &&
                                     <ColumnFilter column={header.column} options={srcOptions} defaultValue={selectedSrc}/> }
-                                {header.column.id === "status" && !!statusOptions &&
+                                {header.column.id === "status_String" && !!statusOptions &&
                                     <ColumnFilter column={header.column} options={statusOptions}/>}
-                                {header.column.id === "src" && !!srcOptions || header.column.id === "status" && !!statusOptions || flexRender(header.column.columnDef.header, header.getContext())}
+                                {header.column.id === "src" && !!srcOptions || header.column.id === "status_String" && !!statusOptions || flexRender(header.column.columnDef.header, header.getContext())}
                             </th>
                         ))}
                     </tr>

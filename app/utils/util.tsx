@@ -80,8 +80,9 @@ export async function getNetworkMap() {
     return nMap;
 }
 
-const COL = {
-    SRC: 'src'
+export const COL = {
+    SRC: 'src',
+    STATUS: 'Status'
 }
 
 export function getNetworkName(nMap: NetworkMap, address: string) {
