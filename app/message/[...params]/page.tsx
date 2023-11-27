@@ -16,15 +16,18 @@ export default async function Page({params}: { params: { params: string[] } }) {
     const links: number[] = JSON.parse(message.links?.String);
     // Array of BTPEVent
     const events: BTPEvent[] = message.btp_events!;
-    let btpMessageFinalized = events.every((event) => {
+    let msgFinalized = events.every((event) => {
         return event.finalized
+    })
+    let msgCompleted = events.some((event) => {
+        return event.event === 'RECEIVE' && event.next === ''
     })
     return (
         <section>
             <h2 className="text-4xl text-center mt-7">BTP Message Delivery</h2>
             <div className="overflow-x-auto m-10 flex justify-center">
                 <div className="w-3/4 flex-col">
-                    <MessageDetail message={message} finalized={btpMessageFinalized} nMap={nMap}/>
+                    <MessageDetail message={message} finalized={msgFinalized} completed={msgCompleted} nMap={nMap}/>
                     <EventList events={events} links={links} nMap={nMap}/>
                     <EventListUnlinked events={events} links={links} nMap={nMap}/>
                 </div>
@@ -33,7 +36,7 @@ export default async function Page({params}: { params: { params: string[] } }) {
     )
 }
 
-function MessageDetail({message, finalized, nMap}: { message: BTPMessage, finalized: boolean, nMap: NetworkMap }) {
+function MessageDetail({message, finalized, completed, nMap}: { message: BTPMessage, finalized: boolean, completed: boolean, nMap: NetworkMap }) {
     const cellClass = "pl-7 py-2 font-light";
     const imgCellClass = "flex items-center px-6 py-2 font-medium whitespace-nowrap";
     const headerClass = cellClass + " bg-gray-100 text-gray-400";
@@ -52,8 +55,10 @@ function MessageDetail({message, finalized, nMap}: { message: BTPMessage, finali
                         {getNetworkName(nMap, message.src)}
                     </td>
                     <th scope="row" className={headerClass}>
+                        {message.status?.String !== 'Completed' ? (completed ? 'Expected Status' : '') : ''}
                     </th>
                     <td className={cellClass}>
+                        {message.status?.String !== 'Completed' ? (completed ? 'Almost Certainly Completed' : '') : ''}
                     </td>
                 </tr>
                 <tr className="bg-white border-2">
@@ -76,7 +81,7 @@ function MessageDetail({message, finalized, nMap}: { message: BTPMessage, finali
                         Status
                     </th>
                     <td className={cellClass}>
-                        {message.status?.String} - Block({finalized ? "Finalized" : "Not Yet"})
+                        {message.status?.String} [{finalized ? "Finalized" : "Not Yet"}]
                     </td>
                     <th scope="col" className={headerClass}>
                         Last Updated
