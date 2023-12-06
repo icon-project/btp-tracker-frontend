@@ -249,7 +249,7 @@ function TableFooter({tableInstance, dataQuery}: {
                     <button className={linkClass} onClick={() => tableInstance.previousPage()}>&#60;</button>
                 </li>
                 <span className={commonClass}>
-                        {tableInstance.getState().pagination.pageIndex + 1}
+                        {tableInstance.getState().pagination.pageIndex + 1} of {dataQuery.data?.total_pages}
                     </span>
                 <li>
                     <button className={linkClass} onClick={() => tableInstance.nextPage()}>&#62;</button>
