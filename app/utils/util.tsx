@@ -81,7 +81,10 @@ export async function getNetworkMap() {
     return nMap;
 }
 
-export const COL = {
+interface Filters {
+    [key: string]:string
+}
+export const COL: Filters = {
     SRC: 'src',
     STATUS: 'Status'
 }
@@ -89,9 +92,6 @@ export const COL = {
 export function getNetworkName(nMap: NetworkMap, address: string) {
     if(Object.keys(nMap).length === 0 || !address) {
         return '';
-    }
-    if(address === COL.SRC) {
-        return 'Source Network (All)';
     }
     return nMap[address]?.name + ' (' + address + ')';
 }

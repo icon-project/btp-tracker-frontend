@@ -65,7 +65,7 @@ function SearchButton({openModal}: {openModal: () => void}) {
 function ModalSearchForm({options, closeModal}: {options?: Summary[], closeModal: () => void}) {
     return (
         <Portal>
-            <div onClick={() => {closeModal()}} className="justify-center fixed inset-0 z-10 bg-gray-100 bg-opacity-75">
+            <div onClick={() => {closeModal()}} className="justify-center fixed inset-0 z-10 bg-gray-100 bg-opacity-40">
                 <div className={"flex h-1/6"}></div>
                 <div onClick={(e) => e.stopPropagation()}>
                     <SearchForm options={options} onSubmitAction={closeModal}/>

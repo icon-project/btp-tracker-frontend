@@ -209,8 +209,9 @@ function TableRow({row}: { row: Row<BTPMessage> }) {
 function ColumnFilter({options, column, defaultValue}: { options: string[], column: Column<any>, defaultValue?: string}) {
     const nMap = useContext(NetworkInfoContext);
     function getDisplayingValue(header: string, elem: string): string {
+        for (const p in COL) if(elem === COL[p]) return "All";
+
         if (header === GV.SOURCE_NETWORK) return getNetworkName(nMap, elem);
-        if (header === GV.STATUS && elem === COL.STATUS) return "All";
         return elem;
     }
     return (
