@@ -94,7 +94,7 @@ function Columns() {
 }
 
 function FilterableMessageTable({networkOptions, selected}: { networkOptions: string[], selected: string}) {
-    const statusOptions = [COL.STATUS, "InDelivery", "Outgoing", "WaitReply", "Incoming", "Completed"];
+    const statusOptions = [COL.STATUS, "Unknown", "Sending", "WaitReply", "Replying", "Completed"];
     const [{pageIndex, pageSize}, setPagination] =
         React.useState<PaginationState>({
             pageIndex: 0,
