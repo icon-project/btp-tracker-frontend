@@ -208,13 +208,18 @@ function TableRow({row}: { row: Row<BTPMessage> }) {
 
 function ColumnFilter({options, column, defaultValue}: { options: string[], column: Column<any>, defaultValue?: string}) {
     const nMap = useContext(NetworkInfoContext);
+    function getDisplayingValue(header: string, elem: string): string {
+        if (header === GV.SOURCE_NETWORK) return getNetworkName(nMap, elem);
+        if (header === GV.STATUS && elem === COL.STATUS) return "All";
+        return elem;
+    }
     return (
         <>
         {column.columnDef.header}
         <br/>
         <select onChange={e => column.setFilterValue(e.target.value)} defaultValue={defaultValue}>
         {options.map((elem) => <option key={elem} value={elem} className='text-xs font-light'>{
-                column.columnDef.header === GV.SOURCE_NETWORK ? getNetworkName(nMap, elem) : elem
+            getDisplayingValue(column.columnDef.header as string, elem)
             }</option>
         )}
         </select>

@@ -3,7 +3,8 @@ import {NetworkMap, TrackerNetwork} from "@/app/NetworkInfo";
 import {Summary} from "@/app/components/Summuries";
 
 export const GV = {
-    SOURCE_NETWORK: 'Source Network'
+    SOURCE_NETWORK: 'Source Network',
+    STATUS: 'Status'
 }
 
 export function getElapsedTime(uTime: string) {
