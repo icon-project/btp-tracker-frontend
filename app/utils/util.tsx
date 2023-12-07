@@ -67,7 +67,7 @@ export function makeFromNowText(fistTime: number, firstText: string, secondTime:
 }
 
 export async function getNetworkMap() {
-    const reqUri = `${process.env.NEXT_PUBLIC_API_URI}/tracker/bmc/network`;
+    const reqUri = `${process.env.API_URI}/tracker/bmc/network`;
     const res = await fetch(reqUri, {cache: 'no-store'});
     const message = await res.json();
     let nMap: NetworkMap = {};
