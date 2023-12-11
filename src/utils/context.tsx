@@ -1,6 +1,5 @@
-
 import {Context, createContext} from 'react';
-import {NetworkMap} from "@/app/NetworkInfo";
+import {NetworkMap} from "./NetworkInfo";
 
 const NetworkInfoContext: Context<NetworkMap> = createContext({});
 

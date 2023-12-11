@@ -1,6 +1,5 @@
 import moment from "moment/moment";
-import {NetworkMap, TrackerNetwork} from "@/app/NetworkInfo";
-import {Summary} from "@/app/components/Summuries";
+import {NetworkMap} from "./NetworkInfo";
 
 export const GV = {
     SOURCE_NETWORK: 'Source Network',
@@ -66,21 +65,6 @@ export function makeFromNowText(fistTime: number, firstText: string, secondTime:
     return result.join(" ")
 }
 
-export async function getNetworkMap() {
-    const reqUri = `${process.env.API_URI}/tracker/bmc/network`;
-    const res = await fetch(reqUri, {cache: 'no-store'});
-    const message = await res.json();
-    let nMap: NetworkMap = {};
-    message.map((net: TrackerNetwork) => (
-        nMap[net.address] = {
-            name: net.name,
-            address: net.address,
-            type: net.type,
-            imageBase64: net.imageBase64
-        }))
-    return nMap;
-}
-
 interface Filters {
     [key: string]:string
 }
@@ -102,13 +86,3 @@ export function getNetworkIcon(nMap: NetworkMap, address: string){
     }
     return nMap[address].imageBase64;
 }
-
-export async function getNetworkOptions() {
-    const summaryRes = await fetch(`${process.env.API_URI}/tracker/bmc/summary`, {cache: 'no-store'});
-    const summaryJson = await summaryRes.json();
-    const summaries = summaryJson as Summary[];
-    const options: string[] = [COL.SRC];
-    for (let i = 0; i < summaries.length; i++) options.push(summaries[i].network_address);
-    return options;
-}
-

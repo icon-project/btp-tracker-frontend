@@ -1,31 +1,28 @@
-'use client'
-import {usePathname, useRouter} from "next/navigation";
 import React, {useContext} from "react";
-import {Summary} from "@/app/components/Summuries";
-import NetworkInfoContext from "@/app/context";
-import {getNetworkName} from "@/app/utils/util";
+import NetworkInfoContext from "../../utils/context";
+import {getNetworkName} from "../../utils";
+import {useLocation, useNavigate} from "react-router-dom";
 
-export default function SearchForm({options, onSubmitAction}: {options?: Summary[], onSubmitAction?: () => void}) {
+export default function SearchForm({options, onSubmitAction}: {options: string[], onSubmitAction?: () => void}) {
     const nMap = useContext(NetworkInfoContext);
-    const router = useRouter();
-    const autoFocus = usePathname() !== "/";
+    const location = useLocation();
+    const navigate = useNavigate();
+    const autoFocus = location.pathname !== "/";
     const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const selectElement = document.querySelector("#searchSelect") as HTMLSelectElement;
         const inputElement = document.querySelector("#searchInput") as HTMLInputElement;
         const net = selectElement.value;
         const nsn = inputElement.value;
-        router.push(`/message/${net}/${nsn}`);
-        if (!!onSubmitAction) onSubmitAction();
+        navigate(`/message/${net}/${nsn}`)
+        if (onSubmitAction) onSubmitAction();
     }
 
     return (
             <form className={"flex w-full justify-center"} onSubmit={onSubmit}>
                 <select className="text-xl bg-[#85dbe5] border border-[#27aab9] rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 text-black mr-1" id={"searchSelect"}>
                     {options && options.map((option) => (
-                        <option key={option.network_address} value={option.network_address}>
-                            {getNetworkName(nMap, option.network_address)}
-                        </option>
+                        <option key={option} value={option}>{getNetworkName(nMap, option)}</option>
                     ))}
                 </select>
                 <input type="text" pattern="0|[1-9][0-9]*"

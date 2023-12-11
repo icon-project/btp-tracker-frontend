@@ -1,7 +1,4 @@
-'use client'
-import {useRouter} from "next/navigation";
-import {BTPMessage} from "@/app/data/BTPMessage";
-import Image from "next/image";
+import {BTPMessage} from "../../data/BTPMessage";
 import React, {useContext} from 'react';
 import {
     Cell, Column, ColumnFiltersState,
@@ -14,8 +11,9 @@ import {
 } from "@tanstack/table-core";
 import {flexRender, useReactTable} from "@tanstack/react-table";
 import {QueryClient, QueryClientProvider, useQuery, UseQueryResult} from "react-query";
-import NetworkInfoContext from "@/app/context";
-import {getElapsedTime, getNetworkIcon, getNetworkName, GV, COL} from "@/app/utils/util";
+import NetworkInfoContext from "../../utils/context";
+import {getElapsedTime, getNetworkIcon, getNetworkName, GV, COL} from "../../utils";
+import {useNavigate} from "react-router-dom";
 
 interface BTPResponse {
     content: BTPMessage[],
@@ -39,7 +37,7 @@ async function fetchData(options: {
     const srcFilter = options.columnFilters[0];
     const statusFilter = options.columnFilters[1];
     const filterQuery = `${filterNames.filter(n => n == srcFilter.value).length == 0 ? "&query[src]=" + srcFilter.value : ""}${!!statusFilter && filterNames.filter(n => n == statusFilter.value).length == 0 ? "&query[status]=" + statusFilter.value : ""}`;
-    const req = `${process.env.NEXT_PUBLIC_API_URI}/tracker/bmc?task=search&page=${options.pageIndex}&size=${options.pageSize}&sort=created_at desc${filterQuery}`;
+    const req = `${import.meta.env.VITE_API_URL}/tracker/bmc?task=search&page=${options.pageIndex}&size=${options.pageSize}&sort=created_at desc${filterQuery}`;
     const res = await fetch(req, {cache: 'no-store'});
     return await res.json();
 }
@@ -59,9 +57,7 @@ export function MessageTable({messages}: { messages: BTPMessage[] }) {
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
     });
-    return (
-        <Table tableInstance={tableInstance}/>
-    );
+    return <TableComp tableInstance={tableInstance}/>;
 }
 
 function Columns() {
@@ -93,7 +89,7 @@ function Columns() {
     );
 }
 
-function FilterableMessageTable({networkOptions, selected}: { networkOptions: string[], selected: string}) {
+function FilterableMessageTable({networkOptions, selected}: { networkOptions: string[], selected: string }) {
     const statusOptions = [COL.STATUS, "Unknown", "Sending", "WaitReply", "Replying", "Completed"];
     const [{pageIndex, pageSize}, setPagination] =
         React.useState<PaginationState>({
@@ -122,7 +118,7 @@ function FilterableMessageTable({networkOptions, selected}: { networkOptions: st
     const defaultData = React.useMemo(() => [], []);
     const tableInstance = useReactTable({
         columns,
-        data: dataQuery.data?.content?? defaultData,
+        data: dataQuery.data?.content ?? defaultData,
         getCoreRowModel: getCoreRowModel(),
         pageCount: dataQuery.data?.total_pages ?? -1,
         state: {
@@ -137,93 +133,95 @@ function FilterableMessageTable({networkOptions, selected}: { networkOptions: st
     });
     return (
         <>
-            <Table tableInstance={tableInstance} statusOptions={statusOptions} srcOptions={networkOptions} selectedSrc={selected}/>
+            <TableComp tableInstance={tableInstance} statusOptions={statusOptions} srcOptions={networkOptions}
+                       selectedSrc={selected}/>
             <TableFooter tableInstance={tableInstance} dataQuery={dataQuery}/>
         </>
     );
 }
 
-function Table({tableInstance, statusOptions, srcOptions, selectedSrc}: {
+function TableComp({tableInstance, statusOptions, srcOptions, selectedSrc}: {
     tableInstance: Table<BTPMessage>,
     statusOptions?: string[],
     srcOptions?: string[],
     selectedSrc?: string
 }) {
     return (
-        <>
-            <table className="w-full text-left">
-                <thead className="bg-gray-100 border-2">
-                {tableInstance.getHeaderGroups().map(headerGroup => (
-                    <tr key={headerGroup.id}>
-                        {headerGroup.headers.map(header => (
-                            <th key={header.id} scope="col" className="pl-6 py-1 font-medium">
-                                {header.column.id === "src" && !!srcOptions &&
-                                    <ColumnFilter column={header.column} options={srcOptions} defaultValue={selectedSrc}/> }
-                                {header.column.id === "status_String" && !!statusOptions &&
-                                    <ColumnFilter column={header.column} options={statusOptions}/>}
-                                {header.column.id === "src" && !!srcOptions || header.column.id === "status_String" && !!statusOptions || flexRender(header.column.columnDef.header, header.getContext())}
-                            </th>
-                        ))}
-                    </tr>
-                ))}
-                </thead>
-                <tbody>
-                {tableInstance.getRowModel().rows.map(row => (
-                    <TableRow key={row.id} row={row}/>
-                ))}
-                </tbody>
-            </table>
-        </>
+        <table className="w-full text-left">
+            <thead className="bg-gray-100 border-2">
+            {tableInstance.getHeaderGroups().map(headerGroup => (
+                <tr key={headerGroup.id}>
+                    {headerGroup.headers.map(header => (
+                        <th key={header.id} scope="col" className="pl-6 py-1 font-medium">
+                            {header.column.id === "src" && !!srcOptions &&
+                                <ColumnFilter column={header.column} options={srcOptions} defaultValue={selectedSrc}/>}
+                            {header.column.id === "status_String" && !!statusOptions &&
+                                <ColumnFilter column={header.column} options={statusOptions}/>}
+                            {header.column.id === "src" && !!srcOptions || header.column.id === "status_String" && !!statusOptions || flexRender(header.column.columnDef.header, header.getContext())}
+                        </th>
+                    ))}
+                </tr>
+            ))}
+            </thead>
+            <tbody>
+            {tableInstance.getRowModel().rows.map(row => (
+                <TableRow key={row.id} row={row}/>
+            ))}
+            </tbody>
+        </table>
     )
 }
 
-function TableCell({cell}: { cell: Cell<BTPMessage, any>}) {
+function TableCell({cell}: { cell: Cell<BTPMessage, any> }) {
     const nMap = useContext(NetworkInfoContext);
     if (Object.keys(nMap).length === 0) return <td></td>;
     const cellClass = "pl-6 py-3";
     const imgCellClass = "flex items-center px-6 py-2 font-medium whitespace-nowrap";
     const value = cell.getValue() as string;
     return (
-        <td key={cell.id} className={(cell.column.id === 'src') || (cell.column.id === 'last_network_address_String') ? imgCellClass : cellClass}>
+        <td key={cell.id}
+            className={(cell.column.id === 'src') || (cell.column.id === 'last_network_address_String') ? imgCellClass : cellClass}>
             {(cell.column.id === 'src' || cell.column.id === 'last_network_address_String') &&
-                <Image className="rounded-full pr-2" alt={value} src={`data:image/png;base64,${getNetworkIcon(nMap, value)}`} width={30} height={30}/> }
-            {(cell.column.id === 'src' || cell.column.id === 'last_network_address_String') && `${getNetworkName(nMap, value)}` }
-            {(cell.column.id === 'nsn' || cell.column.id === 'status_String') && flexRender(cell.column.columnDef.cell, cell.getContext()) }
+                <img className="rounded-full pr-2" alt={value}
+                     src={`data:image/png;base64,${getNetworkIcon(nMap, value)}`} width={30} height={30}/>}
+            {(cell.column.id === 'src' || cell.column.id === 'last_network_address_String') && `${getNetworkName(nMap, value)}`}
+            {(cell.column.id === 'nsn' || cell.column.id === 'status_String') && flexRender(cell.column.columnDef.cell, cell.getContext())}
             {(cell.column.id) === "updated_at" ? <span>{getElapsedTime(value)}</span> : ''}
         </td>
     )
 }
 
 function TableRow({row}: { row: Row<BTPMessage> }) {
-    const router = useRouter();
+    const navigate = useNavigate();
     return (
         <tr key={row.id} className="cursor-pointer bg-white border-2 hover:bg-gray-200" tabIndex={0}
-            onClick={() => router.push(`/message/${row.original.id}`)}>
+            onClick={() => navigate(`/message/${row.original.id}`)}>
             {row.getVisibleCells().map(cell => (
-                <TableCell key={cell.id} cell={cell} />
+                <TableCell key={cell.id} cell={cell}/>
             ))}
         </tr>
     )
 }
 
-function ColumnFilter({options, column, defaultValue}: { options: string[], column: Column<any>, defaultValue?: string}) {
+function ColumnFilter({options, column, defaultValue}: { options: string[], column: Column<any>, defaultValue?: string }) {
     const nMap = useContext(NetworkInfoContext);
     function getDisplayingValue(header: string, elem: string): string {
-        for (const p in COL) if(elem === COL[p]) return "All";
+        for (const p in COL) if (elem === COL[p]) return "All";
 
         if (header === GV.SOURCE_NETWORK) return getNetworkName(nMap, elem);
         return elem;
     }
+
     return (
         <>
-        {column.columnDef.header}
-        <br/>
-        <select onChange={e => column.setFilterValue(e.target.value)} defaultValue={defaultValue}>
-        {options.map((elem) => <option key={elem} value={elem} className='text-xs font-light'>{
-            getDisplayingValue(column.columnDef.header as string, elem)
-            }</option>
-        )}
-        </select>
+            {column.columnDef.header}
+            <br/>
+            <select onChange={e => column.setFilterValue(e.target.value)} defaultValue={defaultValue}>
+                {options.map((elem) => <option key={elem} value={elem} className='text-xs font-light'>{
+                        getDisplayingValue(column.columnDef.header as string, elem)
+                    }</option>
+                )}
+            </select>
         </>
     )
 }
@@ -239,7 +237,7 @@ function TableFooter({tableInstance, dataQuery}: {
         <nav className="flex justify-between pt-4" aria-label="Table navigation">
             <span className="text-sm font-normal text-gray-400">show
                 <select className="w-25 p-2 mb-6 text-xl text-gray-900 rounded-lg bg-white"
-                    onChange={e => tableInstance.setPageSize(Number(e.target.value))}>
+                        onChange={e => tableInstance.setPageSize(Number(e.target.value))}>
                     {
                         pageLimitOptions.map((elem) =>
                             <option key={elem} value={elem}>{elem}</option>
