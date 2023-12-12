@@ -1,6 +1,5 @@
-'use client'
 import { useEffect, useState } from 'react';
-import NetworkInfoContext from "@/app/context";
+import NetworkInfoContext from "./context";
 
 export interface TrackerNetwork {
     name: string,
@@ -17,10 +16,10 @@ const NetworkInfoProvider = ({ children }: {children: React.ReactNode}) => {
     const [data, setData] = useState({});
 
     useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_API_URI}/tracker/bmc/network`)
+        fetch(`${import.meta.env.VITE_API_URL}/tracker/bmc/network`)
             .then((response) => response.json())
             .then((data) => {
-                let nMap: NetworkMap = {};
+                const nMap: NetworkMap = {};
                 data.map((net: TrackerNetwork) => (
                     nMap[net.address] = {
                         name: net.name,

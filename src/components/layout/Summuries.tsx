@@ -1,9 +1,7 @@
-'use client'
-import Image from "next/image";
-import Link from "next/link";
 import {useContext} from "react";
-import NetworkInfoContext from "@/app/context";
-import {getNetworkName} from "@/app/utils/util";
+import NetworkInfoContext from "../../utils/context";
+import {getNetworkName} from "../../utils";
+import {Link} from "react-router-dom";
 
 export interface Summary {
     network_address: string,
@@ -26,9 +24,9 @@ function Summary({summary}: { summary: Summary }) {
     if(Object.keys(nMap).length === 0) return (<div></div>)
     return (
         <div className="w-1/3 text-lg text-left border p-2">
-            <Image className="rounded-full inline" src={`data:image/png;base64,${nMap[summary["network_address"]].imageBase64}`}
+            <img className="rounded-full inline" src={`data:image/png;base64,${nMap[summary["network_address"]].imageBase64}`}
                alt={summary["network_address"]} width={30} height={30}/>
-            <Link href={`/messages?network=${summary["network_address"]}`} className="text-[#27aab9]"> {getNetworkName(nMap, summary["network_address"])}</Link><br/>
+            <Link to={`/messages?network=${summary["network_address"]}`} className="text-[#27aab9]"> {getNetworkName(nMap, summary["network_address"])}</Link><br/>
             <hr className={"my-3"}/>
             <table className="text-right">
                 <tbody>
