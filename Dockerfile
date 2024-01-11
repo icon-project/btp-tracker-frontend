@@ -3,7 +3,7 @@ FROM node:18-alpine3.17 as build
 WORKDIR /app
 COPY . /app
 
-ENV VITE_API_URL=http://${SERVER}:${PORT}
+ENV VITE_API_URL=http://localhost:8080
 RUN npm ci
 RUN npm run build
 
